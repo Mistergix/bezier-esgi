@@ -22,6 +22,8 @@ namespace Esgi.Bezier
 
         [ShowInInspector, ReadOnly]
         private int _currentCurveIndex;
+
+        private ControlPointMover controlPointMover;
         
         public int Steps => steps;
 
@@ -50,12 +52,13 @@ namespace Esgi.Bezier
             base.Init();
             curves = new List<BezierCurve>();
             NewCurve();
+            controlPointMover = new ControlPointMover();
         }
 
         [Button, DisableInEditorMode]
         public void NewCurve()
         {
-            if (curves.Count > 0 && _currentCurve.PointCount == 0)
+            if (CurrentCurveEmpty)
             {
                 PGDebug.Message($"Pas de curve générée").LogWarning();
                 return;
@@ -64,6 +67,8 @@ namespace Esgi.Bezier
             curves.Add(currentCurve);
             _currentCurveIndex = curves.Count - 1;
         }
+
+        private bool CurrentCurveEmpty => curves.Count > 0 && _currentCurve.PointCount == 0;
 
         [Button, DisableInEditorMode]
         public void PrevCurve()
@@ -85,6 +90,12 @@ namespace Esgi.Bezier
         [Button, DisableInEditorMode]
         public void DeleteCurrentCurve()
         {
+            if (CurrentCurveEmpty)
+            {
+                PGDebug.Message($"La courbe n'a pas été détruite").LogWarning();
+                return;
+            }
+            
             Destroy(_currentCurve.gameObject);
             curves.Remove(_currentCurve);
 
@@ -101,15 +112,55 @@ namespace Esgi.Bezier
         private void Update()
         {
             Vector3 clickInWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                        
-            if (Input.GetMouseButtonDown(0))
-            {
-                _currentCurve.AppendPoint(clickInWorldPos);
-            }
 
-            if (Input.GetMouseButtonDown(1))
+            if (Input.GetKey(KeyCode.LeftAlt))
             {
-                _currentCurve.TryDestroyPoint(clickInWorldPos);
+                if (Input.GetMouseButton(0))
+                {
+                    if (controlPointMover.IsHoldingControlPoint)
+                    {
+                        controlPointMover.MoveControlPoint(clickInWorldPos);
+                    }
+                    else
+                    {
+                        List<ControlPoint> allControlPoints = new List<ControlPoint>();
+                        foreach (var curve in curves)
+                        {
+                            allControlPoints.AddRange(curve.ControlPoints); 
+                        }
+
+                        var closestPoints = BezierCurve.ControlPointsInRadius(allControlPoints, clickInWorldPos);
+
+                        if (closestPoints.Count > 0)
+                        {
+                            controlPointMover.HoldPoint(closestPoints[0]);
+                        }
+                    }
+                }
+                else
+                {
+                    if (controlPointMover.IsHoldingControlPoint)
+                    {
+                        controlPointMover.Release();
+                    }
+                }
+            }
+            else
+            {
+                if (controlPointMover.IsHoldingControlPoint)
+                {
+                    controlPointMover.Release();
+                }
+                
+                if (Input.GetMouseButtonDown(0))
+                {
+                    _currentCurve.AppendPoint(clickInWorldPos);
+                }
+
+                if (Input.GetMouseButtonDown(1))
+                {
+                    _currentCurve.TryDestroyPoint(clickInWorldPos);
+                }
             }
 
             foreach (var curve in curves)

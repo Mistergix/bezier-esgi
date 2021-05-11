@@ -52,6 +52,8 @@ namespace Esgi.Bezier
 
         private Color CurveColor => IsMainCurve ? BezierCurveManager.Instance.MainCurveColor : BezierCurveManager.Instance.CurveColor;
 
+        public List<ControlPoint> ControlPoints => controlPoints;
+
         private void DrawControlPointsHandles(int i)
         {
             Draw.Ring(controlPoints[i].position, BezierCurveManager.Instance.ControlPointRadius, BezierCurveManager.Instance.HandleColor);
@@ -83,7 +85,20 @@ namespace Esgi.Bezier
 
         public ControlPoint TryDestroyPoint(Vector3 clickInWorldPos)
         {
-            List<ControlPoint> cps = controlPoints.Where(point =>
+            var cps = ControlPointsInRadius(controlPoints, clickInWorldPos);
+
+            if (cps.Count > 0)
+            {
+                controlPoints.Remove(cps[0]);
+                return cps[0];
+            }
+
+            return null;
+        }
+
+        public static List<ControlPoint> ControlPointsInRadius(List<ControlPoint> points, Vector3 clickInWorldPos)
+        {
+            List<ControlPoint> cps = points.Where(point =>
                 Vector2.Distance(point.position, clickInWorldPos) <= BezierCurveManager.Instance.ControlPointRadius).ToList();
 
             cps.Sort((cp1, cp2) =>
@@ -103,14 +118,7 @@ namespace Esgi.Bezier
 
                 return 0;
             });
-
-            if (cps.Count > 0)
-            {
-                controlPoints.Remove(cps[0]);
-                return cps[0];
-            }
-
-            return null;
+            return cps;
         }
     }
 }
