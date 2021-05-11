@@ -9,7 +9,7 @@ namespace Esgi.Bezier
         public static List<Vector2> GetBezierCurve(List<Vector2> controlPoints, float precision)
         {
             List<Vector2> points = new List<Vector2>();
-            for (float t = 0; t < 1; t += precision)
+            for (float t = 0; t <= 1; t += precision)
             {
                 var oneMinusT = 1 - t;
                 var approximatedPoints = new List<Vector2>(controlPoints);

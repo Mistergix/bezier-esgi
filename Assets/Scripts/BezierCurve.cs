@@ -7,15 +7,14 @@ using Shapes;
 
 namespace Esgi.Bezier
 {
-    public class Manager : ImmediateModeShapeDrawer
+    public class BezierCurve : ImmediateModeShapeDrawer
     {
-        [SerializeField, Range(2, 250)] private int steps = 2;
-        [SerializeField] private float controlPointRadius = .5f;
-        [SerializeField, Min(0)] private float curvePointRadius = .1f;
-        [SerializeField] private bool loopControlPolygon = true;
         private List<ControlPoint> controlPoints;
-        
-        
+        public bool IsMainCurve { get; set; }
+
+        public int PointCount => controlPoints.Count;
+
+
         private void Awake()
         {
             controlPoints = new List<ControlPoint>();
@@ -27,13 +26,19 @@ namespace Esgi.Bezier
             {
                 if (controlPoints.Count >= 2)
                 {
-                    float precision = 1f / steps;
+                    float precision = 1f / BezierCurveManager.Instance.Steps;
                     var coordinates =
                         DeCasteljau.GetBezierCurve(controlPoints.Select(point => point.position).ToList(), precision);
 
                     for (int i = 0; i < coordinates.Count; i++)
                     {
-                        Draw.Disc(coordinates[i], curvePointRadius, Color.blue); 
+                        Draw.Disc(coordinates[i], BezierCurveManager.Instance.CurvePointRadius,
+                            CurveColor);
+
+                        if (BezierCurveManager.Instance.CompleteCasteljauLines && i + 1 < coordinates.Count)
+                        {
+                            Draw.Line(coordinates[i], coordinates[i + 1], BezierCurveManager.Instance.CurvePointRadius, CurveColor);
+                        }
                     }
                 }
                 
@@ -45,16 +50,18 @@ namespace Esgi.Bezier
             }
         }
 
+        private Color CurveColor => IsMainCurve ? BezierCurveManager.Instance.MainCurveColor : BezierCurveManager.Instance.CurveColor;
+
         private void DrawControlPointsHandles(int i)
         {
-            Draw.Ring(controlPoints[i].position, controlPointRadius, Color.red);
+            Draw.Ring(controlPoints[i].position, BezierCurveManager.Instance.ControlPointRadius, BezierCurveManager.Instance.HandleColor);
         }
 
         private void DrawControlPolygons(int i)
         {
             if (i + 1 >= controlPoints.Count)
             {
-                if (loopControlPolygon)
+                if (BezierCurveManager.Instance.LoopControlPolygon)
                 {
                     Draw.LineDashed(controlPoints[i].position, controlPoints[0].position);
                 }
@@ -65,31 +72,19 @@ namespace Esgi.Bezier
             }
         }
 
-        private void Update()
-        {
-            Vector3 clickInWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            
-            if (Input.GetMouseButtonDown(0))
-            {
-                AppendPoint(clickInWorldPos);
-            }
 
-            if (Input.GetMouseButtonDown(1))
-            {
-                TryDestroyPoint(clickInWorldPos);
-            }
-        }
-
-        private void AppendPoint(Vector3 clickInWorldPos)
+        public ControlPoint AppendPoint(Vector3 clickInWorldPos)
         {
             ControlPoint cp = new ControlPoint(clickInWorldPos);
             controlPoints.Add(cp);
+
+            return cp;
         }
 
-        private void TryDestroyPoint(Vector3 clickInWorldPos)
+        public ControlPoint TryDestroyPoint(Vector3 clickInWorldPos)
         {
             List<ControlPoint> cps = controlPoints.Where(point =>
-                Vector2.Distance(point.position, clickInWorldPos) <= controlPointRadius).ToList();
+                Vector2.Distance(point.position, clickInWorldPos) <= BezierCurveManager.Instance.ControlPointRadius).ToList();
 
             cps.Sort((cp1, cp2) =>
             {
@@ -112,7 +107,10 @@ namespace Esgi.Bezier
             if (cps.Count > 0)
             {
                 controlPoints.Remove(cps[0]);
+                return cps[0];
             }
+
+            return null;
         }
     }
 }
