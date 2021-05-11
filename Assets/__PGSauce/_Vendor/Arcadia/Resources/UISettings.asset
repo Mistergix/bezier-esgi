@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4efba8dcde6670e42a3a504756dba4a4, type: 3}
+  m_Name: UISettings
+  m_EditorClassIdentifier: 
+  m_loadAllOnStart: 0
+  m_layerNames:
+  - Other
+  - Background
+  - MainMenu
+  - HUD
+  - Popups
+  m_groupsNames:
+  - Group1
+  - Main Menu
+  m_groupsMenus:
+  - menuList:
+    - {fileID: 114369450700569120, guid: d9f82b2578f9e5e4295867785d25fec4, type: 3}
+    - {fileID: 114291504198261890, guid: ac01eea61e90fd244a99ec904b27f4f9, type: 3}
+    - {fileID: 114418954410212178, guid: a5e6754b6773cf34ea198fb99cfb0ea9, type: 3}
+    - {fileID: 114682388395251702, guid: 9a5a09c9d2e991040b2d05b9baec79de, type: 3}
+    - {fileID: 114485315725419542, guid: 90a81d71b6563c54ca39a2ff90e8011f, type: 3}
+    - {fileID: 114154841081932610, guid: 3eeb09888b4f4a44588da737c96a92ab, type: 3}
+  - menuList:
+    - {fileID: 2348433541475416402, guid: e48c857936eebe742b6986b04442ecc3, type: 3}
+    - {fileID: 613202535032469690, guid: 795379d08d0c47c4f83d94c54587d7ff, type: 3}
+    - {fileID: 804080879282317843, guid: 0bf09dc872452564f997dab9845fd607, type: 3}
+    - {fileID: 1664587948239962771, guid: 91bcf0731a3592b4ab84c38071645df4, type: 3}
+    - {fileID: 1153604008470016841, guid: dfdfd91cf6078584896452997cb0513d, type: 3}
+    - {fileID: 4578535409451913148, guid: 9a01c43bac3a4424b9690c2b74712278, type: 3}
+    - {fileID: 1130247769300119519, guid: 22b6295c80721694390a698236997347, type: 3}
+    - {fileID: 8676548063385209942, guid: 90015b7b53b5e7f4185cb5de51086506, type: 3}
