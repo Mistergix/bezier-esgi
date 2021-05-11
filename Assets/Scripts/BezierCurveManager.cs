@@ -15,7 +15,7 @@ namespace Esgi.Bezier
         [SerializeField, Min(0)] private float curvePointRadius = .1f;
         [SerializeField] private bool loopControlPolygon = true, completeCasteljauLines = true;
         [SerializeField] private BezierCurve bezierCurvePrefab;
-        [SerializeField] private Color handleColor = Color.red, curveColor = Color.blue, focusedHandleColor = Color.green, mainCurveColor = Color.magenta;
+        [SerializeField] private Color handleColor = Color.red, curveColor = Color.blue, mainCurveColor = Color.magenta;
 
         private List<BezierCurve> curves;
         private BezierCurve _currentCurve => curves[_currentCurveIndex];
@@ -36,8 +36,6 @@ namespace Esgi.Bezier
         public bool CompleteCasteljauLines => completeCasteljauLines;
 
         public Color MainCurveColor => mainCurveColor;
-
-        public Color FocusedHandleColor => focusedHandleColor;
 
         public Color CurveColor
         {
