@@ -50,7 +50,7 @@ namespace Esgi.Bezier
             var delta = clickInWorldPos - (Vector3)transformPoint;
             delta *= translateSpeed;
 
-            for (int i = 0; i < points.Count; i++)
+            for (var i = 0; i < points.Count; i++)
             {
                 var point = points[i];
                 point.position = originalPositions[i] + (Vector2)delta;
@@ -87,7 +87,7 @@ namespace Esgi.Bezier
             var delta = clickInWorldPos - (Vector3)transformPoint;
             delta *= shearSpeed;
 
-            for (int i = 0; i < points.Count; i++)
+            for (var i = 0; i < points.Count; i++)
             {
                 var point = points[i];
                 var pos = originalPositions[i];
