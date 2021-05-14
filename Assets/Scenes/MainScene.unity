@@ -348,3 +348,6 @@ MonoBehaviour:
   loopControlPolygon: 0
   completeCasteljauLines: 1
   bezierCurvePrefab: {fileID: 4428192976574746498, guid: c0976238b902f4c4e80ddefa4c05df01, type: 3}
+  handleColor: {r: 0, g: 1, b: 0.35476446, a: 1}
+  curveColor: {r: 0, g: 0.65242577, b: 1, a: 1}
+  mainCurveColor: {r: 1, g: 0.45164225, b: 0.3726415, a: 1}

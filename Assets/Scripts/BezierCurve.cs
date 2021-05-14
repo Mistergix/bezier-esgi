@@ -37,7 +37,7 @@ namespace Esgi.Bezier
 
                         if (BezierCurveManager.Instance.CompleteCasteljauLines && i + 1 < coordinates.Count)
                         {
-                            Draw.Line(coordinates[i], coordinates[i + 1], BezierCurveManager.Instance.CurvePointRadius, CurveColor);
+                            Draw.Line(coordinates[i], coordinates[i + 1], BezierCurveManager.Instance.CurvePointRadius * 2, CurveColor);
                         }
                     }
                 }
@@ -119,6 +119,11 @@ namespace Esgi.Bezier
                 return 0;
             });
             return cps;
+        }
+
+        public void DestroyPoint(ControlPoint closestPoint)
+        {
+            controlPoints.Remove(closestPoint);
         }
     }
 }

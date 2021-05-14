@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using PGSauce.Core.PGDebugging;
 using PGSauce.Core.Utilities;
 using Sirenix.OdinInspector;
@@ -24,7 +25,9 @@ namespace Esgi.Bezier
         private int _currentCurveIndex;
 
         private ControlPointMover controlPointMover;
-        
+        private Dictionary<ControlPoint, BezierCurve> pointToCurve;
+        private List<ControlPoint> _allControlPoints;
+
         public int Steps => steps;
 
         public float ControlPointRadius => controlPointRadius;
@@ -48,6 +51,7 @@ namespace Esgi.Bezier
         public override void Init()
         {
             base.Init();
+            pointToCurve = new Dictionary<ControlPoint, BezierCurve>();
             curves = new List<BezierCurve>();
             NewCurve();
             controlPointMover = new ControlPointMover();
@@ -93,6 +97,16 @@ namespace Esgi.Bezier
                 PGDebug.Message($"La courbe n'a pas été détruite").LogWarning();
                 return;
             }
+
+            var points = pointToCurve.Keys.Where(point => pointToCurve[point] == _currentCurve);
+
+            var controlPoints = points.ToList();
+            foreach (var point in controlPoints)
+            {
+                pointToCurve.Remove(point);
+            }
+
+            PGDebug.SetCondition(true).Message($"{controlPoints.Count()} points removed").Log();
             
             Destroy(_currentCurve.gameObject);
             curves.Remove(_currentCurve);
@@ -110,6 +124,8 @@ namespace Esgi.Bezier
         private void Update()
         {
             Vector3 clickInWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            _allControlPoints = AllControlPoints();
+            var closestPoints = BezierCurve.ControlPointsInRadius(_allControlPoints, clickInWorldPos);
 
             if (Input.GetKey(KeyCode.LeftAlt))
             {
@@ -121,14 +137,6 @@ namespace Esgi.Bezier
                     }
                     else
                     {
-                        List<ControlPoint> allControlPoints = new List<ControlPoint>();
-                        foreach (var curve in curves)
-                        {
-                            allControlPoints.AddRange(curve.ControlPoints); 
-                        }
-
-                        var closestPoints = BezierCurve.ControlPointsInRadius(allControlPoints, clickInWorldPos);
-
                         if (closestPoints.Count > 0)
                         {
                             controlPointMover.HoldPoint(closestPoints[0]);
@@ -152,12 +160,24 @@ namespace Esgi.Bezier
                 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    _currentCurve.AppendPoint(clickInWorldPos);
+                    var cp = _currentCurve.AppendPoint(clickInWorldPos);
+                    pointToCurve.Add(cp, _currentCurve);
                 }
 
                 if (Input.GetMouseButtonDown(1))
                 {
-                    _currentCurve.TryDestroyPoint(clickInWorldPos);
+                    if (closestPoints.Count > 0)
+                    {
+                        if (pointToCurve.ContainsKey(closestPoints[0]))
+                        {
+                            var curve = pointToCurve[closestPoints[0]];
+                            curve.DestroyPoint(closestPoints[0]);
+                            pointToCurve.Remove(closestPoints[0]);
+                            closestPoints.RemoveAt(0);
+                        }
+                    }
+                    
+                    //_currentCurve.TryDestroyPoint(clickInWorldPos);
                 }
             }
 
@@ -165,6 +185,17 @@ namespace Esgi.Bezier
             {
                 curve.IsMainCurve = curve == _currentCurve;
             }
+        }
+
+        private List<ControlPoint> AllControlPoints()
+        {
+            List<ControlPoint> allControlPoints = new List<ControlPoint>();
+            foreach (var curve in curves)
+            {
+                allControlPoints.AddRange(curve.ControlPoints);
+            }
+
+            return allControlPoints;
         }
     }
 }
