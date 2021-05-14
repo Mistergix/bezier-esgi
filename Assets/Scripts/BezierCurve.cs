@@ -41,11 +41,14 @@ namespace Esgi.Bezier
                         }
                     }
                 }
-                
-                for (int i = 0; i < controlPoints.Count; i++)
+
+                if (!BezierCurveManager.Instance.HideMetaData)
                 {
-                    DrawControlPolygons(i);
-                    DrawControlPointsHandles(i);
+                    for (int i = 0; i < controlPoints.Count; i++)
+                    {
+                        DrawControlPolygons(i);
+                        DrawControlPointsHandles(i);
+                    }
                 }
             }
         }

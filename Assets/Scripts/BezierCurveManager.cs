@@ -20,6 +20,7 @@ namespace Esgi.Bezier
         [SerializeField] private Color handleColor = Color.red, curveColor = Color.blue, mainCurveColor = Color.magenta;
         [SerializeField] private CurveTransform curveTransform;
         [SerializeField] private bool manipulateCurrentCurve = true;
+        [SerializeField] private bool hideMetaData;
 
         private List<BezierCurve> curves;
         private BezierCurve _currentCurve => curves[_currentCurveIndex];
@@ -74,6 +75,8 @@ namespace Esgi.Bezier
         }
 
         private bool CurrentCurveEmpty => curves.Count > 0 && _currentCurve.PointCount == 0;
+
+        public bool HideMetaData => hideMetaData;
 
         [Button, DisableInEditorMode]
         public void PrevCurve()
