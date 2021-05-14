@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Shapes;
+using UnityEditor.UIElements;
 
 namespace Esgi.Bezier
 {
@@ -10,9 +11,9 @@ namespace Esgi.Bezier
     {
         
         [SerializeField] private Color pointColor = Color.yellow;
-        [SerializeField] private float transformPointLerpRatio = .2f;
         [SerializeField] private float translateSpeed = 1f;
         [SerializeField] private float scaleSpeed = 1;
+        [SerializeField] private float shearSpeed = 1;
 
         private delegate void OnDraw();
 
@@ -21,10 +22,6 @@ namespace Esgi.Bezier
         private Vector2 transformPoint;
         
         public bool ShowPoint { get; set; }
-
-        public Vector2 TransformPoint => transformPoint;
-
-        public float TransformPointLerpRatio => transformPointLerpRatio;
 
         private void Awake()
         {
@@ -48,14 +45,17 @@ namespace Esgi.Bezier
             transformPoint = point;
         }
 
-        public void Translate(Vector3 clickInWorldPos, List<ControlPoint> points)
+        public void Translate(Vector3 clickInWorldPos, List<ControlPoint> points, List<Vector2> originalPositions)
         {
             var delta = clickInWorldPos - (Vector3)transformPoint;
-            foreach (var point in points)
-            {
-                point.position += (Vector2)delta * (Time.deltaTime * translateSpeed);
-            }
+            delta *= translateSpeed;
 
+            for (int i = 0; i < points.Count; i++)
+            {
+                var point = points[i];
+                point.position = originalPositions[i] + (Vector2)delta;
+            }
+            
             onDraw = () =>
             {
                 Draw.Line(transformPoint, clickInWorldPos, .2f, pointColor);
@@ -73,11 +73,29 @@ namespace Esgi.Bezier
             for (var i = 0; i < points.Count; i++)
             {
                 var point = points[i];
-                point.position = originalPositions[i] + (originalPositions[i] - transformPoint).normalized *
-                    Vector2.Distance(originalPositions[i], transformPoint) * distance;
+                point.position = originalPositions[i] + (originalPositions[i] - transformPoint).normalized * (Vector2.Distance(originalPositions[i], transformPoint) * distance);
             }
 
+            onDraw = () =>
+            {
+                Draw.Line(transformPoint, clickInWorldPos, .2f, pointColor);
+            };
+        }
 
+        public void Shear(Vector3 clickInWorldPos, List<ControlPoint> points, List<Vector2> originalPositions)
+        {
+            var delta = clickInWorldPos - (Vector3)transformPoint;
+            delta *= shearSpeed;
+
+            for (int i = 0; i < points.Count; i++)
+            {
+                var point = points[i];
+                var pos = originalPositions[i];
+                var x = pos.x;
+                var y = pos.y;
+                pos = new Vector2(x + delta.x * y, y + delta.y * x);
+                point.position = pos;
+            }
             
             onDraw = () =>
             {

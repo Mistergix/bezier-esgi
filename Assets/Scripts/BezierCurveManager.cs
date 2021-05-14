@@ -161,20 +161,21 @@ namespace Esgi.Bezier
                 if (Input.GetMouseButtonDown(0))
                 {
                     curveTransform.SetPoint(clickInWorldPos);
+                    SetOriginalPositions();
                 }
                 else if(Input.GetMouseButton(0))
                 {
                     if (manipulateCurrentCurve)
                     {
-                        curveTransform.Translate(clickInWorldPos, _currentCurve.ControlPoints);
+                        curveTransform.Translate(clickInWorldPos, _currentCurve.ControlPoints, originalPos);
                     }
                     else
                     {
-                        curveTransform.Translate(clickInWorldPos, _allControlPoints);
+                        curveTransform.Translate(clickInWorldPos, _allControlPoints, originalPos);
                     }
 
                     curveTransform.ShowPoint = true;
-                    curveTransform.SetPoint(Vector3.Lerp(curveTransform.TransformPoint,clickInWorldPos, curveTransform.TransformPointLerpRatio));
+                    //curveTransform.SetPoint(Vector3.Lerp(curveTransform.TransformPoint,clickInWorldPos, curveTransform.TransformPointLerpRatio));
                 }
             }
             else if (Input.GetKey(KeyCode.S))
@@ -194,6 +195,28 @@ namespace Esgi.Bezier
                     else
                     {
                         curveTransform.Scale(clickInWorldPos, _allControlPoints, originalPos);
+                    }
+
+                    curveTransform.ShowPoint = true;
+                }
+            }
+            else if (Input.GetKey(KeyCode.C))
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    curveTransform.SetPoint(clickInWorldPos);
+
+                    SetOriginalPositions();
+                }
+                else if(Input.GetMouseButton(0))
+                {
+                    if (manipulateCurrentCurve)
+                    {
+                        curveTransform.Shear(clickInWorldPos, _currentCurve.ControlPoints, originalPos);
+                    }
+                    else
+                    {
+                        curveTransform.Shear(clickInWorldPos, _allControlPoints, originalPos);
                     }
 
                     curveTransform.ShowPoint = true;
