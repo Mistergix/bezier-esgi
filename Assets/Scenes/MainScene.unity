@@ -309,6 +309,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1475089987}
   - component: {fileID: 1475089988}
+  - component: {fileID: 1475089989}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -351,3 +352,21 @@ MonoBehaviour:
   handleColor: {r: 0, g: 1, b: 0.35476446, a: 1}
   curveColor: {r: 0, g: 0.65242577, b: 1, a: 1}
   mainCurveColor: {r: 1, g: 0.45164225, b: 0.3726415, a: 1}
+  curveTransform: {fileID: 1475089989}
+  manipulateCurrentCurve: 1
+--- !u!114 &1475089989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1475089986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2d81991fd6c4ce4bb7113cf407c8c77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useCullingMasks: 0
+  pointColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  transformPointLerpRatio: 0.1
+  translateSpeed: 10

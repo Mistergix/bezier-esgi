@@ -17,6 +17,8 @@ namespace Esgi.Bezier
         [SerializeField] private bool loopControlPolygon = true, completeCasteljauLines = true;
         [SerializeField] private BezierCurve bezierCurvePrefab;
         [SerializeField] private Color handleColor = Color.red, curveColor = Color.blue, mainCurveColor = Color.magenta;
+        [SerializeField] private CurveTransform curveTransform;
+        [SerializeField] private bool manipulateCurrentCurve = true;
 
         private List<BezierCurve> curves;
         private BezierCurve _currentCurve => curves[_currentCurveIndex];
@@ -120,7 +122,7 @@ namespace Esgi.Bezier
                 NextCurve();
             }
         }
-
+        
         private void Update()
         {
             Vector3 clickInWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -151,8 +153,30 @@ namespace Esgi.Bezier
                     }
                 }
             }
+            else if (Input.GetKey(KeyCode.T))
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    curveTransform.SetPoint(clickInWorldPos);
+                }
+                else if(Input.GetMouseButton(0))
+                {
+                    if (manipulateCurrentCurve)
+                    {
+                        curveTransform.Translate(clickInWorldPos, _currentCurve.ControlPoints);
+                    }
+                    else
+                    {
+                        curveTransform.Translate(clickInWorldPos, _allControlPoints);
+                    }
+
+                    curveTransform.ShowPoint = true;
+                    curveTransform.SetPoint(Vector3.Lerp(curveTransform.TransformPoint,clickInWorldPos, curveTransform.TransformPointLerpRatio));
+                }
+            }
             else
             {
+                curveTransform.ShowPoint = false;
                 if (controlPointMover.IsHoldingControlPoint)
                 {
                     controlPointMover.Release();
@@ -166,24 +190,27 @@ namespace Esgi.Bezier
 
                 if (Input.GetMouseButtonDown(1))
                 {
-                    if (closestPoints.Count > 0)
-                    {
-                        if (pointToCurve.ContainsKey(closestPoints[0]))
-                        {
-                            var curve = pointToCurve[closestPoints[0]];
-                            curve.DestroyPoint(closestPoints[0]);
-                            pointToCurve.Remove(closestPoints[0]);
-                            closestPoints.RemoveAt(0);
-                        }
-                    }
-                    
-                    //_currentCurve.TryDestroyPoint(clickInWorldPos);
+                    TryDestroyPoint(closestPoints);
                 }
             }
 
             foreach (var curve in curves)
             {
                 curve.IsMainCurve = curve == _currentCurve;
+            }
+        }
+
+        private void TryDestroyPoint(List<ControlPoint> closestPoints)
+        {
+            if (closestPoints.Count > 0)
+            {
+                if (pointToCurve.ContainsKey(closestPoints[0]))
+                {
+                    var curve = pointToCurve[closestPoints[0]];
+                    curve.DestroyPoint(closestPoints[0]);
+                    pointToCurve.Remove(closestPoints[0]);
+                    closestPoints.RemoveAt(0);
+                }
             }
         }
 
