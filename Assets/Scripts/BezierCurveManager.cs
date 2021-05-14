@@ -177,19 +177,34 @@ namespace Esgi.Bezier
                     curveTransform.SetPoint(Vector3.Lerp(curveTransform.TransformPoint,clickInWorldPos, curveTransform.TransformPointLerpRatio));
                 }
             }
+            else if (Input.GetKey(KeyCode.S))
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    curveTransform.SetPoint(clickInWorldPos);
+
+                    SetOriginalPositions();
+                }
+                else if(Input.GetMouseButton(0))
+                {
+                    if (manipulateCurrentCurve)
+                    {
+                        curveTransform.Scale(clickInWorldPos, _currentCurve.ControlPoints, originalPos);
+                    }
+                    else
+                    {
+                        curveTransform.Scale(clickInWorldPos, _allControlPoints, originalPos);
+                    }
+
+                    curveTransform.ShowPoint = true;
+                }
+            }
             else if(Input.GetKey(KeyCode.R))
             {
                 if (Input.GetMouseButtonDown(0))
                 {
                     curveTransform.SetPoint(clickInWorldPos);
-                    if (manipulateCurrentCurve)
-                    {
-                        originalPos = _currentCurve.ControlPoints.Select(point => point.position).ToList();
-                    }
-                    else
-                    {
-                        originalPos = _allControlPoints.Select(point => point.position).ToList();
-                    }
+                    SetOriginalPositions();
                 }
                 else if(Input.GetMouseButton(0))
                 {
@@ -228,6 +243,18 @@ namespace Esgi.Bezier
             foreach (var curve in curves)
             {
                 curve.IsMainCurve = curve == _currentCurve;
+            }
+        }
+
+        private void SetOriginalPositions()
+        {
+            if (manipulateCurrentCurve)
+            {
+                originalPos = _currentCurve.ControlPoints.Select(point => point.position).ToList();
+            }
+            else
+            {
+                originalPos = _allControlPoints.Select(point => point.position).ToList();
             }
         }
 

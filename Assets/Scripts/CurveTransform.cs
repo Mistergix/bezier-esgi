@@ -12,6 +12,7 @@ namespace Esgi.Bezier
         [SerializeField] private Color pointColor = Color.yellow;
         [SerializeField] private float transformPointLerpRatio = .2f;
         [SerializeField] private float translateSpeed = 1f;
+        [SerializeField] private float scaleSpeed = 1;
 
         private delegate void OnDraw();
 
@@ -61,6 +62,29 @@ namespace Esgi.Bezier
             };
         }
 
+        public void Scale(Vector3 clickInWorldPos, List<ControlPoint> points, List<Vector2> originalPositions)
+        {
+            clickInWorldPos.y = transformPoint.y;
+            var delta = clickInWorldPos - (Vector3)transformPoint;
+            
+            var distance = Vector2.Distance(clickInWorldPos, transformPoint);
+            distance *= scaleSpeed * Mathf.Sign(delta.x);
+            
+            for (var i = 0; i < points.Count; i++)
+            {
+                var point = points[i];
+                point.position = originalPositions[i] + (originalPositions[i] - transformPoint).normalized *
+                    Vector2.Distance(originalPositions[i], transformPoint) * distance;
+            }
+
+
+            
+            onDraw = () =>
+            {
+                Draw.Line(transformPoint, clickInWorldPos, .2f, pointColor);
+            };
+        }
+
         public void Rotate(Vector3 clickInWorldPos, List<ControlPoint> points, List<Vector2> originalPositions)
         {
             var delta = clickInWorldPos - (Vector3)transformPoint;
@@ -82,7 +106,6 @@ namespace Esgi.Bezier
             {
                 Draw.Arc(transformPoint, BezierCurveManager.Instance.ControlPointRadius * 2, .1f, 0, angle * Mathf.Deg2Rad, pointColor);
             };
-            
         }
 
         private static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles) {

@@ -370,3 +370,4 @@ MonoBehaviour:
   pointColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   transformPointLerpRatio: 0.1
   translateSpeed: 10
+  scaleSpeed: 1
