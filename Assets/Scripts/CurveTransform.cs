@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,9 +8,15 @@ namespace Esgi.Bezier
 {
     public class CurveTransform : ImmediateModeShapeDrawer
     {
+        
         [SerializeField] private Color pointColor = Color.yellow;
         [SerializeField] private float transformPointLerpRatio = .2f;
         [SerializeField] private float translateSpeed = 1f;
+
+        private delegate void OnDraw();
+
+        private OnDraw onDraw;
+        
         private Vector2 transformPoint;
         
         public bool ShowPoint { get; set; }
@@ -18,6 +25,11 @@ namespace Esgi.Bezier
 
         public float TransformPointLerpRatio => transformPointLerpRatio;
 
+        private void Awake()
+        {
+            onDraw = () => { };
+        }
+
         public override void DrawShapes(Camera cam)
         {
             if(!ShowPoint) { return; }
@@ -25,6 +37,8 @@ namespace Esgi.Bezier
             using (Draw.Command(cam))
             {
                 Draw.Ring(transformPoint, BezierCurveManager.Instance.ControlPointRadius, pointColor);
+                
+                onDraw?.Invoke();
             }
         }
 
@@ -38,8 +52,44 @@ namespace Esgi.Bezier
             var delta = clickInWorldPos - (Vector3)transformPoint;
             foreach (var point in points)
             {
-                point.position += (Vector2)delta * Time.deltaTime * translateSpeed;
+                point.position += (Vector2)delta * (Time.deltaTime * translateSpeed);
             }
+
+            onDraw = () =>
+            {
+                Draw.Line(transformPoint, clickInWorldPos, .2f, pointColor);
+            };
+        }
+
+        public void Rotate(Vector3 clickInWorldPos, List<ControlPoint> points, List<Vector2> originalPositions)
+        {
+            var delta = clickInWorldPos - (Vector3)transformPoint;
+            
+            var angle = Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg;
+
+            for (var i = 0; i < points.Count; i++)
+            {
+                var point = points[i];
+                point.position = RotatePointAroundPivot(originalPositions[i], transformPoint, new Vector3(0, 0, angle));
+            }
+
+            if (angle < 0)
+            {
+                angle += 360;
+            }
+
+            onDraw = () =>
+            {
+                Draw.Arc(transformPoint, BezierCurveManager.Instance.ControlPointRadius * 2, .1f, 0, angle * Mathf.Deg2Rad, pointColor);
+            };
+            
+        }
+
+        private static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles) {
+            var dir = point - pivot; // get point direction relative to pivot
+            dir = Quaternion.Euler(angles) * dir; // rotate it
+            point = dir + pivot; // calculate rotated point
+            return point; // return it
         }
     }
 }

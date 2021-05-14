@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using PGSauce.Core.PGDebugging;
 using PGSauce.Core.Utilities;
 using Sirenix.OdinInspector;
@@ -122,6 +123,8 @@ namespace Esgi.Bezier
                 NextCurve();
             }
         }
+
+        [NotNull] private List<Vector2> originalPos;
         
         private void Update()
         {
@@ -172,6 +175,34 @@ namespace Esgi.Bezier
 
                     curveTransform.ShowPoint = true;
                     curveTransform.SetPoint(Vector3.Lerp(curveTransform.TransformPoint,clickInWorldPos, curveTransform.TransformPointLerpRatio));
+                }
+            }
+            else if(Input.GetKey(KeyCode.R))
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    curveTransform.SetPoint(clickInWorldPos);
+                    if (manipulateCurrentCurve)
+                    {
+                        originalPos = _currentCurve.ControlPoints.Select(point => point.position).ToList();
+                    }
+                    else
+                    {
+                        originalPos = _allControlPoints.Select(point => point.position).ToList();
+                    }
+                }
+                else if(Input.GetMouseButton(0))
+                {
+                    if (manipulateCurrentCurve)
+                    {
+                        curveTransform.Rotate(clickInWorldPos, _currentCurve.ControlPoints, originalPos);
+                    }
+                    else
+                    {
+                        curveTransform.Rotate(clickInWorldPos, _allControlPoints, originalPos);
+                    }
+
+                    curveTransform.ShowPoint = true;
                 }
             }
             else
