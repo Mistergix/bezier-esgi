@@ -21,6 +21,7 @@ namespace Esgi.Bezier
         [SerializeField] private CurveTransform curveTransform;
         [SerializeField] private bool manipulateCurrentCurve = true;
         [SerializeField] private bool hideMetaData;
+        [SerializeField] private bool showConvexHull;
 
         private List<BezierCurve> curves;
         private BezierCurve _currentCurve => curves[_currentCurveIndex];
@@ -77,6 +78,8 @@ namespace Esgi.Bezier
         private bool CurrentCurveEmpty => curves.Count > 0 && _currentCurve.PointCount == 0;
 
         public bool HideMetaData => hideMetaData;
+
+        public bool ShowConvexHull => showConvexHull;
 
         [Button, DisableInEditorMode]
         public void PrevCurve()

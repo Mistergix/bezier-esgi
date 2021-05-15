@@ -50,7 +50,21 @@ namespace Esgi.Bezier
                         DrawControlPointsHandles(i);
                     }
                 }
+
+                if (BezierCurveManager.Instance.ShowConvexHull)
+                {
+                    var hull = GrahamScan.ComputeGrahamScan(controlPoints.Select(point => (Vector3)point.position).ToList());
+                    for (int i = 0; i < hull.Count; i++)
+                    {
+                        DrawConvexHull(hull, i);
+                    }
+                }
             }
+        }
+
+        private void DrawConvexHull(List<Vector3> hull, int i)
+        {
+            Draw.Line(hull[i], hull[(i + 1) >= hull.Count ? 0 : i + 1], Color.black);
         }
 
         private Color CurveColor => IsMainCurve ? BezierCurveManager.Instance.MainCurveColor : BezierCurveManager.Instance.CurveColor;
