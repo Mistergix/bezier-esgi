@@ -313,7 +313,7 @@ GameObject:
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 8418204508859773708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -354,6 +354,7 @@ MonoBehaviour:
   mainCurveColor: {r: 1, g: 0.45164225, b: 0.3726415, a: 1}
   curveTransform: {fileID: 1475089989}
   manipulateCurrentCurve: 1
+  hideMetaData: 0
 --- !u!114 &1475089989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -368,7 +369,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useCullingMasks: 0
   pointColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  transformPointLerpRatio: 0.1
   translateSpeed: 1
   scaleSpeed: 1
   shearSpeed: 1
