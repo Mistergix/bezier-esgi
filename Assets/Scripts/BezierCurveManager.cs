@@ -24,7 +24,7 @@ namespace Esgi.Bezier
         [SerializeField] private bool showConvexHull;
 
         private List<BezierCurve> curves;
-        private BezierCurve _currentCurve => curves[_currentCurveIndex];
+        public BezierCurve CurrentCurve => curves[_currentCurveIndex];
 
         [ShowInInspector, ReadOnly]
         private int _currentCurveIndex;
@@ -75,7 +75,7 @@ namespace Esgi.Bezier
             _currentCurveIndex = curves.Count - 1;
         }
 
-        private bool CurrentCurveEmpty => curves.Count > 0 && _currentCurve.PointCount == 0;
+        private bool CurrentCurveEmpty => curves.Count > 0 && CurrentCurve.PointCount == 0;
 
         public bool HideMetaData => hideMetaData;
 
@@ -107,7 +107,7 @@ namespace Esgi.Bezier
                 return;
             }
 
-            var points = pointToCurve.Keys.Where(point => pointToCurve[point] == _currentCurve);
+            var points = pointToCurve.Keys.Where(point => pointToCurve[point] == CurrentCurve);
 
             var controlPoints = points.ToList();
             foreach (var point in controlPoints)
@@ -117,8 +117,8 @@ namespace Esgi.Bezier
 
             PGDebug.SetCondition(true).Message($"{controlPoints.Count()} points removed").Log();
             
-            Destroy(_currentCurve.gameObject);
-            curves.Remove(_currentCurve);
+            Destroy(CurrentCurve.gameObject);
+            curves.Remove(CurrentCurve);
 
             if (curves.Count == 0)
             {
@@ -197,7 +197,7 @@ namespace Esgi.Bezier
                         throw new UnityException("IMPOSSIBLE");
                     }
 
-                    action(clickInWorldPos, manipulateCurrentCurve ? _currentCurve.ControlPoints : _allControlPoints,
+                    action(clickInWorldPos, manipulateCurrentCurve ? CurrentCurve.ControlPoints : _allControlPoints,
                         originalPos);
 
                     curveTransform.ShowPoint = true;
@@ -213,8 +213,8 @@ namespace Esgi.Bezier
                 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    var cp = _currentCurve.AppendPoint(clickInWorldPos);
-                    pointToCurve.Add(cp, _currentCurve);
+                    var cp = CurrentCurve.AppendPoint(clickInWorldPos);
+                    pointToCurve.Add(cp, CurrentCurve);
                 }
 
                 if (Input.GetMouseButtonDown(1))
@@ -225,7 +225,7 @@ namespace Esgi.Bezier
 
             foreach (var curve in curves)
             {
-                curve.IsMainCurve = curve == _currentCurve;
+                curve.IsMainCurve = curve == CurrentCurve;
             }
         }
 
@@ -233,7 +233,7 @@ namespace Esgi.Bezier
         {
             if (manipulateCurrentCurve)
             {
-                originalPos = _currentCurve.ControlPoints.Select(point => point.position).ToList();
+                originalPos = CurrentCurve.ControlPoints.Select(point => point.position).ToList();
             }
             else
             {
