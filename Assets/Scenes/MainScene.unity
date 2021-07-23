@@ -152,6 +152,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c44e2dfbfda1bae45acb36a2bfde22c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  showConvexHull: 0
+  profile2D: 0
+  currentMode: 0
 --- !u!4 &472450312
 Transform:
   m_ObjectHideFlags: 0
@@ -392,7 +395,6 @@ MonoBehaviour:
   steps: 50
   controlPointRadius: 0.25
   curvePointRadius: 0.03
-  loopControlPolygon: 0
   completeCasteljauLines: 1
   bezierCurvePrefab: {fileID: 4428192976574746498, guid: c0976238b902f4c4e80ddefa4c05df01, type: 3}
   handleColor: {r: 0, g: 1, b: 0.35476446, a: 1}
@@ -400,8 +402,6 @@ MonoBehaviour:
   mainCurveColor: {r: 1, g: 0.45164225, b: 0.3726415, a: 1}
   curveTransform: {fileID: 1475089989}
   manipulateCurrentCurve: 1
-  hideMetaData: 0
-  showConvexHull: 0
 --- !u!114 &1475089989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -431,10 +431,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dda86fa157ee6542be26d4493d0310f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  edgeRingCount: 20
+  edgeRingCount: 50
   shape: {fileID: 11400000, guid: aed24372da9159248b430de4a71a040e, type: 2}
-  showMetaData: 0
-  doNormals: 0
+  doNormals: 1
 --- !u!33 &1475089991
 MeshFilter:
   m_ObjectHideFlags: 0

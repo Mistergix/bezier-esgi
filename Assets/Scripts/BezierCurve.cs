@@ -20,14 +20,115 @@ namespace Esgi.Bezier
 
         public OrientatedPoint GetOrientedPointAt(float t)
         {
+
+            if (Manager.Instance.profile2D == Manager.Profile2D.Bezier)
+            {
+                return new OrientatedPoint()
+                {
+                    forward = GetTangentAt(t),
+                    position = GetPosAt(t),
+                    right = Right,
+                    rotation = GetOrientationAt(t),
+                    up = GetUpAt(t)
+                };
+            }
+            
             return new OrientatedPoint()
             {
-                forward = GetTangentAt(t),
-                position = GetPosAt(t),
+                forward = GetTangentAtPolygon(t),
+                position = GetPosAtPolygon(t),
                 right = Right,
-                rotation = GetOrientationAt(t),
-                up = GetUpAt(t)
+                rotation = GetOrientationAtPolygon(t),
+                up = GetUpAtPolygon(t)
             };
+            
+        }
+
+        private Quaternion GetOrientationAtPolygon(float t)
+        {
+            var forward = GetTangentAtPolygon(t);
+            var up = GetUpAtPolygon(t);
+            
+            var m = new Matrix4x4();
+            m.SetColumn(0, Right);
+            m.SetColumn(1, up);
+            m.SetColumn(2, forward);
+
+            return QuaternionFromMatrix(m);
+        }
+
+        private Vector2 GetUpAtPolygon(float t)
+        {
+            return Vector3.Cross(GetTangentAtPolygon(t), Right);
+        }
+
+        private Vector2 GetTangentAtPolygon(float t)
+        {
+            var totalLength = PolygonLength();
+            var goalLength = t * totalLength;
+            var currentLength = 0f;
+            var currentIndex = 0;
+
+            while (currentLength < goalLength && currentIndex < controlPoints.Count - 1)
+            {
+                Vector3 currentPoint = controlPoints[currentIndex];
+                Vector3 nextPoint = controlPoints[currentIndex + 1];
+                var nextDiffLength = Vector3.Distance(currentPoint, nextPoint);
+                if (currentLength + nextDiffLength < goalLength)
+                {
+                    currentLength += nextDiffLength;
+                    currentIndex++;
+                }
+                else
+                {
+
+                    var diff = goalLength - currentLength;
+                    var newT = diff / nextDiffLength;
+                    return (nextPoint - currentPoint).normalized;
+                }
+            }
+
+            return ((Vector3)controlPoints[controlPoints.Count - 1] - controlPoints[controlPoints.Count - 2]).normalized;
+        }
+
+        private Vector2 GetPosAtPolygon(float t)
+        {
+            var totalLength = PolygonLength();
+            var goalLength = t * totalLength;
+            var currentLength = 0f;
+            var currentIndex = 0;
+
+            while (currentLength < goalLength && currentIndex < controlPoints.Count - 1)
+            {
+                Vector3 currentPoint = controlPoints[currentIndex];
+                Vector3 nextPoint = controlPoints[currentIndex + 1];
+                var nextDiffLength = Vector3.Distance(currentPoint, nextPoint);
+                if (currentLength + nextDiffLength < goalLength)
+                {
+                    currentLength += nextDiffLength;
+                    currentIndex++;
+                }
+                else
+                {
+
+                    var diff = goalLength - currentLength;
+                    var newT = diff / nextDiffLength;
+                    return Vector3.Lerp(currentPoint, nextPoint, newT);
+                }
+            }
+
+            return controlPoints[controlPoints.Count - 1];
+        }
+
+        private float PolygonLength()
+        {
+            var length = 0f;
+            for (var i = 0; i < controlPoints.Count - 1; i++)
+            {
+                length += Vector3.Distance(controlPoints[i], controlPoints[i + 1]);
+            }
+
+            return length;
         }
 
         public Vector2 GetPosAt(float t)
@@ -99,7 +200,7 @@ namespace Esgi.Bezier
                     DrawControlPolygon();
                 }
 
-                if (BezierCurveManager.Instance.ShowConvexHull)
+                if (Manager.Instance.ShowConvexHull)
                 {
                     var hull = GrahamScan.ComputeGrahamScan(controlPoints.Select(point => (Vector3)point.position).ToList());
                     for (int i = 0; i < hull.Count; i++)

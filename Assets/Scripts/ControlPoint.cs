@@ -14,6 +14,7 @@ namespace Esgi.Bezier
         }
         
         public static implicit operator Vector2(ControlPoint cp) => cp.position;
+        public static implicit operator Vector3(ControlPoint cp) => cp.position;
     }
 
     public struct OrientatedPoint

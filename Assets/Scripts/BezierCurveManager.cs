@@ -20,7 +20,7 @@ namespace Esgi.Bezier
         [SerializeField] private Color handleColor = Color.red, curveColor = Color.blue, mainCurveColor = Color.magenta;
         [SerializeField] private CurveTransform curveTransform;
         [SerializeField] private bool manipulateCurrentCurve = true;
-        [SerializeField] private bool showConvexHull;
+        
 
         private List<BezierCurve> curves;
         public BezierCurve CurrentCurve => curves[_currentCurveIndex];
@@ -74,7 +74,7 @@ namespace Esgi.Bezier
 
         private bool CurrentCurveEmpty => curves.Count > 0 && CurrentCurve.PointCount == 0;
 
-        public bool ShowConvexHull => showConvexHull;
+        
 
         [Button, DisableInEditorMode]
         public void PrevCurve()

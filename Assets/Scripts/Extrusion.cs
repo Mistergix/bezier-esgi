@@ -13,28 +13,14 @@ namespace Esgi.Bezier
         [Range(2, 200)]
         [SerializeField] private int edgeRingCount = 20;
         [SerializeField] private Mesh2D shape;
-        [SerializeField] private bool showMetaData;
         public bool doNormals;
         private Mesh mesh;
 
-        private bool _showMesh;
-        
-        [Button, DisableInEditorMode]
-        public void ShowMesh()
-        {
-            _showMesh = true;
-        }
-
-        [Button, DisableInEditorMode]
-        public void HideMesh()
-        {
-            _showMesh = false;
-        }
 
         public override void Init()
         {
             base.Init();
-            mesh = new Mesh {name = "Extrusion"};
+            mesh = new Mesh {name = "Extrusion Simple"};
             GetComponent<MeshFilter>().sharedMesh = mesh;
         }
 
@@ -52,7 +38,7 @@ namespace Esgi.Bezier
         {
             mesh.Clear();
             
-            if(!_showMesh) {return;}
+            if(Manager.Instance.currentMode != Manager.Mode.Simple){return;}
 
             var bezier = BezierCurveManager.Instance.CurrentCurve;
             
@@ -102,8 +88,6 @@ namespace Esgi.Bezier
             mesh.SetTriangles(tris, 0);
             
         }
-
-        public bool ShowMetaData => showMetaData;
 
     }
 }
