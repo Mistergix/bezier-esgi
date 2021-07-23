@@ -89,25 +89,12 @@ namespace Esgi.Bezier
         {
             using (Draw.Command(cam))
             {
-                if (controlPoints.Count >= 2)
+                if (Manager.Instance.profile2D == Manager.Profile2D.Bezier)
                 {
-                    float precision = 1f / BezierCurveManager.Instance.Steps;
-                    var coordinates =
-                        DeCasteljau.GetBezierCurve(controlPoints.Select(point => point.position).ToList(), precision);
-
-                    for (int i = 0; i < coordinates.Count; i++)
-                    {
-                        Draw.Disc(coordinates[i], BezierCurveManager.Instance.CurvePointRadius,
-                            CurveColor);
-
-                        if (BezierCurveManager.Instance.CompleteCasteljauLines && i + 1 < coordinates.Count)
-                        {
-                            Draw.Line(coordinates[i], coordinates[i + 1], BezierCurveManager.Instance.CurvePointRadius * 2, CurveColor);
-                        }
-                    }
+                    DrawBezierCurve();
                 }
-
-                if (!BezierCurveManager.Instance.HideMetaData)
+                
+                if (Manager.Instance.profile2D == Manager.Profile2D.Polygon || Manager.Instance.currentMode == Manager.Mode.Profile2D)
                 {
                     DrawControlPolygon();
                 }
@@ -122,13 +109,38 @@ namespace Esgi.Bezier
                 }
             }
         }
-        
+
+        private void DrawBezierCurve()
+        {
+            if (controlPoints.Count >= 2)
+            {
+                float precision = 1f / BezierCurveManager.Instance.Steps;
+                var coordinates =
+                    DeCasteljau.GetBezierCurve(controlPoints.Select(point => point.position).ToList(), precision);
+
+                for (int i = 0; i < coordinates.Count; i++)
+                {
+                    Draw.Disc(coordinates[i], BezierCurveManager.Instance.CurvePointRadius,
+                        CurveColor);
+
+                    if (BezierCurveManager.Instance.CompleteCasteljauLines && i + 1 < coordinates.Count)
+                    {
+                        Draw.Line(coordinates[i], coordinates[i + 1], BezierCurveManager.Instance.CurvePointRadius * 2,
+                            CurveColor);
+                    }
+                }
+            }
+        }
+
         private void DrawControlPolygon()
         {
             for (var i = 0; i < controlPoints.Count; i++)
             {
                 DrawControlPolygons(i);
-                DrawControlPointsHandles(i);
+                if (Manager.Instance.currentMode == Manager.Mode.Profile2D)
+                {
+                    DrawControlPointsHandles(i);
+                }
             }
         }
 
@@ -150,7 +162,7 @@ namespace Esgi.Bezier
         {
             if (i + 1 >= controlPoints.Count)
             {
-                if (BezierCurveManager.Instance.LoopControlPolygon)
+                if (Manager.Instance.profile2D == Manager.Profile2D.Polygon)
                 {
                     Draw.LineDashed(controlPoints[i].position, controlPoints[0].position);
                 }

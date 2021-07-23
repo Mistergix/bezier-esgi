@@ -15,12 +15,11 @@ namespace Esgi.Bezier
         [SerializeField, Range(2, 250)] private int steps = 2;
         [SerializeField, Min(0)] private float controlPointRadius = .5f;
         [SerializeField, Min(0)] private float curvePointRadius = .1f;
-        [SerializeField] private bool loopControlPolygon = true, completeCasteljauLines = true;
+        [SerializeField] private bool completeCasteljauLines = true;
         [SerializeField] private BezierCurve bezierCurvePrefab;
         [SerializeField] private Color handleColor = Color.red, curveColor = Color.blue, mainCurveColor = Color.magenta;
         [SerializeField] private CurveTransform curveTransform;
         [SerializeField] private bool manipulateCurrentCurve = true;
-        [SerializeField] private bool hideMetaData;
         [SerializeField] private bool showConvexHull;
 
         private List<BezierCurve> curves;
@@ -38,8 +37,6 @@ namespace Esgi.Bezier
         public float ControlPointRadius => controlPointRadius;
 
         public float CurvePointRadius => curvePointRadius;
-
-        public bool LoopControlPolygon => loopControlPolygon;
 
         public bool CompleteCasteljauLines => completeCasteljauLines;
 
@@ -76,8 +73,6 @@ namespace Esgi.Bezier
         }
 
         private bool CurrentCurveEmpty => curves.Count > 0 && CurrentCurve.PointCount == 0;
-
-        public bool HideMetaData => hideMetaData;
 
         public bool ShowConvexHull => showConvexHull;
 
@@ -137,6 +132,7 @@ namespace Esgi.Bezier
         
         private void Update()
         {
+            if(Manager.Instance.currentMode != Manager.Mode.Profile2D){return;}
             Vector3 clickInWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             _allControlPoints = AllControlPoints();
             var closestPoints = BezierCurve.ControlPointsInRadius(_allControlPoints, clickInWorldPos);
