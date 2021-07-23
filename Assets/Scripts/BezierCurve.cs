@@ -11,8 +11,16 @@ namespace Esgi.Bezier
 {
     public class BezierCurve : ImmediateModeShapeDrawer
     {
+        [SerializeField, Range(0, 1)] private float tTest;
         private List<ControlPoint> controlPoints;
         public bool IsMainCurve { get; set; }
+
+        private void OnDrawGizmos()
+        {
+            if(controlPoints.Count <2){return;}
+            var p = GetOrientedPointAt(tTest);
+            Handles.PositionHandle(p.position, p.rotation);
+        }
 
         public int PointCount => controlPoints.Count;
         
@@ -69,10 +77,10 @@ namespace Esgi.Bezier
             var currentLength = 0f;
             var currentIndex = 0;
 
-            while (currentLength < goalLength && currentIndex < controlPoints.Count - 1)
+            while (currentLength <= goalLength && currentIndex < controlPoints.Count - (Manager.Instance.closePolygon ? 0 : 1))
             {
                 Vector3 currentPoint = controlPoints[currentIndex];
-                Vector3 nextPoint = controlPoints[currentIndex + 1];
+                Vector3 nextPoint = controlPoints[currentIndex + 1 >= controlPoints.Count ? 0 : currentIndex + 1];
                 var nextDiffLength = Vector3.Distance(currentPoint, nextPoint);
                 if (currentLength + nextDiffLength < goalLength)
                 {
@@ -88,7 +96,10 @@ namespace Esgi.Bezier
                 }
             }
 
-            return ((Vector3)controlPoints[controlPoints.Count - 1] - controlPoints[controlPoints.Count - 2]).normalized;
+            var pos1 = (Vector3) controlPoints[Manager.Instance.closePolygon ? 0 : controlPoints.Count - 1];
+            var pos2 = (Vector3) controlPoints[Manager.Instance.closePolygon ? controlPoints.Count - 1 : controlPoints.Count - 2];
+
+            return (pos1 - pos2).normalized;
         }
 
         private Vector2 GetPosAtPolygon(float t)
@@ -98,10 +109,10 @@ namespace Esgi.Bezier
             var currentLength = 0f;
             var currentIndex = 0;
 
-            while (currentLength < goalLength && currentIndex < controlPoints.Count - 1)
+            while (currentLength <= goalLength && currentIndex < controlPoints.Count - (Manager.Instance.closePolygon ? 0 : 1))
             {
                 Vector3 currentPoint = controlPoints[currentIndex];
-                Vector3 nextPoint = controlPoints[currentIndex + 1];
+                Vector3 nextPoint = controlPoints[currentIndex + 1 >= controlPoints.Count ? 0 : currentIndex + 1];
                 var nextDiffLength = Vector3.Distance(currentPoint, nextPoint);
                 if (currentLength + nextDiffLength < goalLength)
                 {
@@ -117,7 +128,7 @@ namespace Esgi.Bezier
                 }
             }
 
-            return controlPoints[controlPoints.Count - 1];
+            return controlPoints[Manager.Instance.closePolygon ? 0 : controlPoints.Count - 1];
         }
 
         private float PolygonLength()
@@ -126,6 +137,11 @@ namespace Esgi.Bezier
             for (var i = 0; i < controlPoints.Count - 1; i++)
             {
                 length += Vector3.Distance(controlPoints[i], controlPoints[i + 1]);
+            }
+
+            if (Manager.Instance.closePolygon)
+            {
+                length += Vector3.Distance(controlPoints[0], controlPoints[controlPoints.Count - 1]);
             }
 
             return length;
@@ -179,7 +195,6 @@ namespace Esgi.Bezier
         {
             return controlPoints.Select(point => point.position).ToList();
         }
-
 
         private void Awake()
         {
@@ -263,7 +278,7 @@ namespace Esgi.Bezier
         {
             if (i + 1 >= controlPoints.Count)
             {
-                if (Manager.Instance.profile2D == Manager.Profile2D.Polygon)
+                if (Manager.Instance.closePolygon)
                 {
                     Draw.LineDashed(controlPoints[i].position, controlPoints[0].position);
                 }

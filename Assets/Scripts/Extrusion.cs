@@ -20,7 +20,7 @@ namespace Esgi.Bezier
         public override void Init()
         {
             base.Init();
-            mesh = new Mesh {name = "Extrusion Simple"};
+            mesh = new Mesh {name = "Extrusion Généralisée de balayage"};
             GetComponent<MeshFilter>().sharedMesh = mesh;
         }
 
@@ -38,7 +38,7 @@ namespace Esgi.Bezier
         {
             mesh.Clear();
             
-            if(Manager.Instance.currentMode != Manager.Mode.Simple){return;}
+            if(Manager.Instance.currentMode != Manager.Mode.General){return;}
 
             var bezier = BezierCurveManager.Instance.CurrentCurve;
             

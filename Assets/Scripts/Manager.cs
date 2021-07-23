@@ -8,6 +8,7 @@ namespace Esgi.Bezier
     public class Manager : MonoSingleton<Manager>
     {
         [SerializeField] private bool showConvexHull;
+        public bool closePolygon;
         public bool ShowConvexHull => showConvexHull;
         
         public enum Profile2D
