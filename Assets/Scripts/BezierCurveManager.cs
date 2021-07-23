@@ -257,7 +257,7 @@ namespace Esgi.Bezier
 
         private List<ControlPoint> AllControlPoints()
         {
-            List<ControlPoint> allControlPoints = new List<ControlPoint>();
+            var allControlPoints = new List<ControlPoint>();
             foreach (var curve in curves)
             {
                 allControlPoints.AddRange(curve.ControlPoints);
