@@ -74,13 +74,6 @@ namespace Esgi.Bezier
             return q;
         }
 
-        private void OnDrawGizmos()
-        {
-            Handles.PositionHandle(GetPosAt(tTest), GetOrientationAt(tTest));
-        }
-
-        public float tTest => Extrusion.Instance.tTest;
-
         public List<Vector2> ControlPointsPositions()
         {
             return controlPoints.Select(point => point.position).ToList();
@@ -126,18 +119,6 @@ namespace Esgi.Bezier
                     {
                         DrawConvexHull(hull, i);
                     }
-                }
-
-                if (Extrusion.Instance.ShowMetaData)
-                {
-                    var point = GetOrientedPointAt(tTest);
-                    var pos = point.position;
-                    var forward = point.forward;
-                    var up1 = point.up;
-                    Draw.Disc(pos, .1f, Color.black);
-                    Draw.Line(pos, pos + forward, BezierCurveManager.Instance.CurvePointRadius * 2, Color.blue);
-                    Draw.Line(pos, pos + (Vector2) up1, BezierCurveManager.Instance.CurvePointRadius * 2, Color.green);
-                    Draw.Line(pos, (Vector3)pos + Right, BezierCurveManager.Instance.CurvePointRadius * 2, Color.red);
                 }
             }
         }

@@ -13,8 +13,8 @@ namespace Esgi.Bezier
         [Range(2, 200)]
         [SerializeField] private int edgeRingCount = 20;
         [SerializeField] private Mesh2D shape;
-        [Range(0, 1)] public float tTest = .25f;
         [SerializeField] private bool showMetaData;
+        public bool doNormals;
         private Mesh mesh;
 
         private bool _showMesh;
@@ -57,13 +57,14 @@ namespace Esgi.Bezier
             var bezier = BezierCurveManager.Instance.CurrentCurve;
             
             var verts = new List<Vector3>();
-
+            var normals = new List<Vector3>();
             for (var ring = 0; ring < edgeRingCount; ring++)
             {
                 var point = bezier.GetOrientedPointAt((float) ring / (edgeRingCount - 1));
                 for (var i = 0; i < shape.VertexCount; i++)
                 {
                     verts.Add(point.LocalToWorldPosition(shape.Vertices[i].point));
+                    normals.Add(point.LocalToWorldDirection(shape.Vertices[i].normal));
                 }
             }
 
@@ -94,26 +95,15 @@ namespace Esgi.Bezier
             }
             
             mesh.SetVertices(verts);
+            if (doNormals)
+            {
+                mesh.SetNormals(normals);
+            }
             mesh.SetTriangles(tris, 0);
             
         }
 
         public bool ShowMetaData => showMetaData;
 
-        private void OnDrawGizmos()
-        {
-            if (!showMetaData){return;}
-            var bezier = BezierCurveManager.Instance.CurrentCurve;
-            var point = bezier.GetOrientedPointAt(tTest);
-
-            var worldPoints = shape.Vertices.Select(vertex => point.LocalToWorldPosition(vertex.point)).ToArray();
-
-            for (var i = 0; i < shape.LineIndices.Length - 1; i+= 2)
-            {
-                var a = worldPoints[shape.LineIndices[i]];
-                var b = worldPoints[shape.LineIndices[i + 1]];
-                Gizmos.DrawLine(a, b);
-            }
-        }
     }
 }
