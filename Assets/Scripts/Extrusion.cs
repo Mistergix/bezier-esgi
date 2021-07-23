@@ -12,6 +12,9 @@ namespace Esgi.Bezier
     {
         [Range(2, 200)]
         [SerializeField] private int edgeRingCount = 20;
+
+        [SerializeField] private float starScale = 1;
+        [SerializeField] private float finalScale = 0.2f;
         [SerializeField] private Mesh2D shape;
         public bool doNormals;
         private Mesh mesh;
@@ -46,10 +49,12 @@ namespace Esgi.Bezier
             var normals = new List<Vector3>();
             for (var ring = 0; ring < edgeRingCount; ring++)
             {
-                var point = bezier.GetOrientedPointAt((float) ring / (edgeRingCount - 1));
+                var t = (float) ring / (edgeRingCount - 1);
+                var scale = Mathf.Lerp(starScale, finalScale, t);
+                var point = bezier.GetOrientedPointAt(t);
                 for (var i = 0; i < shape.VertexCount; i++)
                 {
-                    verts.Add(point.LocalToWorldPosition(shape.Vertices[i].point));
+                    verts.Add(point.LocalToWorldPosition(shape.Vertices[i].point * scale));
                     normals.Add(point.LocalToWorldDirection(shape.Vertices[i].normal));
                 }
             }

@@ -153,6 +153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showConvexHull: 0
+  closePolygon: 0
   profile2D: 0
   currentMode: 0
 --- !u!4 &472450312
@@ -432,6 +433,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   edgeRingCount: 50
+  starScale: 5
+  finalScale: 1
   shape: {fileID: 11400000, guid: aed24372da9159248b430de4a71a040e, type: 2}
   doNormals: 1
 --- !u!33 &1475089991
