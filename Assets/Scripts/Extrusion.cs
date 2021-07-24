@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PGSauce.Core.Utilities;
 using Sirenix.OdinInspector;
+using UnityEditor;
 
 namespace Esgi.Bezier
 {
@@ -18,6 +19,52 @@ namespace Esgi.Bezier
         [SerializeField] private Mesh2D shape;
         public bool doNormals;
         private Mesh mesh;
+
+        [SerializeField] private bool debugMesh2D;
+
+        [SerializeField, Range(0, 1f), ShowIf("@debugMesh2D")]
+        private float tTest;
+
+        private void OnDrawGizmos()
+        {
+            if(!debugMesh2D) {return;}
+            OrientatedPoint op;
+
+            if (BezierCurveManager.Instance)
+            {
+                if (BezierCurveManager.Instance.CurrentCurve.ControlPointsCount <= 1)
+                {
+                    return;
+                }
+                op = BezierCurveManager.Instance.CurrentCurve.GetOrientedPointAt(tTest);
+            }
+            else
+            {
+                op = new OrientatedPoint()
+                {
+                    position = Vector2.zero,
+                    rotation = Quaternion.identity
+                };
+            }
+            
+            var scale =  Mathf.Lerp(starScale, finalScale, tTest);
+            
+            for (var i = 0; i < shape.VertexCount; i++)
+            {
+                var pos = op.LocalToWorldPosition(shape.Vertices[i].point * scale);
+                Gizmos.DrawSphere(pos, 0.15f);
+                Gizmos.DrawRay(pos, op.LocalToWorldDirection(shape.Vertices[i].normal));
+            }
+
+            for (var i = 0; i < shape.LineCount; i++)
+            {
+                var index = shape.LineIndices[i];
+                var vert = shape.Vertices[index];
+                
+                var pos = op.LocalToWorldPosition(vert.point * scale) + Vector3.up * .2f;
+                Handles.Label(pos, $"{index}");
+            }
+        }
 
 
         public override void Init()
@@ -65,10 +112,13 @@ namespace Esgi.Bezier
                 var rootIndex = ring * shape.VertexCount;
                 var rootIndexNext = rootIndex + shape.VertexCount;
 
-                for (var line = 0; line < shape.LineCount - 1; line+=2)
+                var line = 0;
+                while (line < shape.LineCount - 1)
                 {
                     var lineIndexA = shape.LineIndices[line];
                     var lineIndexB = shape.LineIndices[line + 1];
+                    
+                    if(lineIndexA == -1 || lineIndexB == -1){continue;}
 
                     var currentA = rootIndex + lineIndexA;
                     var currentB = rootIndex + lineIndexB;
@@ -82,6 +132,9 @@ namespace Esgi.Bezier
                     tris.Add(currentA);
                     tris.Add(nextB);
                     tris.Add(currentB);
+
+
+                    line += shape.Vertices[shape.LineIndices[line]].multiplicity;
                 }
             }
             

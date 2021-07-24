@@ -6,9 +6,8 @@ using Sirenix.OdinInspector;
 
 namespace Esgi.Bezier
 {
-    [CreateAssetMenu(menuName = "Bezier/ Mesh 2D")]
     [TypeInfoBox("Cross section of the extruded primitive")]
-    public class Mesh2D : ScriptableObject
+    public abstract class Mesh2D : ScriptableObject
     {
         [Serializable]
         public class Vertex
@@ -16,17 +15,12 @@ namespace Esgi.Bezier
             public Vector2 point;
             public Vector2 normal;
             public float uv;
+            public int multiplicity;
         }
+        
+        public abstract Vertex[] Vertices { get; }
 
-        [SerializeField]
-        private Vertex[] _vertices;
-
-        [SerializeField]
-        private int[] _lineIndices;
-
-        public Vertex[] Vertices => _vertices;
-
-        public int[] LineIndices => _lineIndices;
+        public abstract int[] LineIndices { get; }
         public int VertexCount => Vertices.Length;
         public int LineCount => LineIndices.Length;
     }

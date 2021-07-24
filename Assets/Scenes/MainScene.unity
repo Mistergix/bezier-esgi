@@ -432,11 +432,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dda86fa157ee6542be26d4493d0310f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  edgeRingCount: 50
-  starScale: 5
+  edgeRingCount: 5
+  starScale: 1
   finalScale: 1
-  shape: {fileID: 11400000, guid: aed24372da9159248b430de4a71a040e, type: 2}
+  shape: {fileID: 11400000, guid: 0d1be2e1dacf377459ea633508724461, type: 2}
   doNormals: 1
+  debugMesh2D: 1
+  tTest: 0
 --- !u!33 &1475089991
 MeshFilter:
   m_ObjectHideFlags: 0

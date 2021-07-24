@@ -268,6 +268,7 @@ namespace Esgi.Bezier
         private Color CurveColor => IsMainCurve ? BezierCurveManager.Instance.MainCurveColor : BezierCurveManager.Instance.CurveColor;
 
         public List<ControlPoint> ControlPoints => controlPoints;
+        public int ControlPointsCount => ControlPoints.Count;
 
         private void DrawControlPointsHandles(int i)
         {
