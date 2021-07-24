@@ -54,6 +54,28 @@ namespace Esgi.Bezier
             }
         }
 
+        public override List<Vector3> GetPositions(float t)
+        {
+            var verts = new List<Vector3>();
+            shape.UpdateData();
+            var angle = 360f * t;
+            var cos = Mathf.Cos(angle * Mathf.Deg2Rad);
+            var sin = Mathf.Sin(angle * Mathf.Deg2Rad);
+                
+            for (var i = 0; i < shape.VertexCount; i++)
+            {
+                var point = shape.Vertices[i].point;
+                var localPos = new Vector3(point.x * cos, point.y, point.x * sin);
+
+                tmp.up = Axis;
+                child.localPosition = localPos;
+
+                verts.Add(child.position);
+            }
+
+            return verts;
+        }
+
         protected override void GenerateMesh()
         {
             base.GenerateMesh();

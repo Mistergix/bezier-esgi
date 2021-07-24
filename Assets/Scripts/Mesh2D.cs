@@ -23,5 +23,10 @@ namespace Esgi.Bezier
         public abstract int[] LineIndices { get; }
         public int VertexCount => Vertices.Length;
         public int LineCount => LineIndices.Length;
+
+        public virtual void UpdateData()
+        {
+            
+        }
     }
 }

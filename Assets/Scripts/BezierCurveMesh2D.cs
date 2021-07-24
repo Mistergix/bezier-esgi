@@ -10,43 +10,53 @@ namespace Esgi.Bezier
     {
         [SerializeField, Range(2, 50)] private int samples = 10;
 
-        public override Vertex[] Vertices
-        {
-            get
-            {
-                var res = new List<Vertex>();
-                if(BezierCurveManager.Instance == null)
-                {
-                    return Array.Empty<Vertex>();
-                }
-                var bezier = BezierCurveManager.Instance.Profile2DCurve;
-                if(bezier == null || bezier.ControlPoints.Count < 2)
-                {
-                    return Array.Empty<Vertex>();
-                }
-                for (var i = 0; i < samples; i++)
-                {
-                    var t = i / (samples - 1f);
-                    var op = bezier.GetOrientedPointAt(t);
-                    res.Add(new Vertex()
-                    {
-                        multiplicity = 1,
-                        point = op.position,
-                        normal = op.up
-                    });
-                }
+        private Vertex[] _vertices;
+        private int[] _lineIndices;
 
-                return res.ToArray();
-            }
+        public override void UpdateData()
+        {
+            base.UpdateData();
+            _vertices = ComputeVertices();
+            _lineIndices = ComputeLineIndices();
         }
 
-        public override int[] LineIndices
+        public override Vertex[] Vertices => _vertices;
+
+        private Vertex[] ComputeVertices()
         {
-            get
+            var res = new List<Vertex>();
+            if (BezierCurveManager.Instance == null)
             {
-                var l = Enumerable.Range(0, Vertices.Length).ToList();
-                return l.ToArray();
+                return Array.Empty<Vertex>();
             }
+
+            var bezier = BezierCurveManager.Instance.Profile2DCurve;
+            if (bezier == null || bezier.ControlPoints.Count < 2)
+            {
+                return Array.Empty<Vertex>();
+            }
+
+            for (var i = 0; i < samples; i++)
+            {
+                var t = i / (samples - 1f);
+                var op = bezier.GetOrientedPointAt(t);
+                res.Add(new Vertex()
+                {
+                    multiplicity = 1,
+                    point = op.position,
+                    normal = op.up
+                });
+            }
+
+            return res.ToArray();
+        }
+
+        public override int[] LineIndices => _lineIndices;
+
+        private int[] ComputeLineIndices()
+        {
+            var l = Enumerable.Range(0, Vertices.Length).ToList();
+            return l.ToArray();
         }
     }
 }

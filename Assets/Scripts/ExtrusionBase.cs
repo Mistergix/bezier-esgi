@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
@@ -47,6 +48,7 @@ namespace Esgi.Bezier
             mesh.Clear();
             if(Manager.Instance.currentMode != ExtrusionMode){return;}
             GetComponent<MeshFilter>().sharedMesh = mesh;
+            shape.UpdateData();
             GenerateMesh();
         }
 
@@ -60,5 +62,7 @@ namespace Esgi.Bezier
         protected virtual void Init()
         {
         }
+
+        public abstract List<Vector3> GetPositions(float t);
     }
 }

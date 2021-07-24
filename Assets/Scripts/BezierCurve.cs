@@ -225,14 +225,25 @@ namespace Esgi.Bezier
                     {
                         if(Manager.Instance.currentMode != Manager.Mode.Revolution || Mode != Manager.Mode.SweepPath)
                         {
-                            DrawBezierCurve();
+                            DrawBezierCurveOrientated();
                         }
                     }
                 }
                 
                 if (Profile2D == Manager.Profile2D.Polygon || Manager.Instance.Is2DEditing)
                 {
-                    DrawControlPolygon();
+                    if (Manager.Instance.Is2DEditing)
+                    {
+                        DrawControlPolygon();
+                    }
+                    else
+                    {
+                        if(Manager.Instance.currentMode != Manager.Mode.Revolution || Mode != Manager.Mode.SweepPath)
+                        {
+                            DrawControlPolygon();
+                        }
+                    }
+                    
                 }
 
                 if (Manager.Instance.ShowConvexHull)
@@ -242,6 +253,22 @@ namespace Esgi.Bezier
                     {
                         DrawConvexHull(hull, i);
                     }
+                }
+            }
+        }
+
+        private void DrawBezierCurveOrientated()
+        {
+            var positions = Manager.Instance.CurrentExtrusion.GetPositions(Manager.Instance.tTest);
+            for (var i = 0; i < positions.Count; i++)
+            {
+                Draw.Disc(positions[i], BezierCurveManager.Instance.CurvePointRadius,
+                    CurveColor);
+
+                if (BezierCurveManager.Instance.CompleteCasteljauLines && i + 1 < positions.Count)
+                {
+                    Draw.Line(positions[i], positions[i + 1], BezierCurveManager.Instance.CurvePointRadius * 2,
+                        CurveColor);
                 }
             }
         }

@@ -117,5 +117,19 @@ namespace Esgi.Bezier
             
         }
 
+        public override List<Vector3> GetPositions(float t)
+        {
+            var verts = new List<Vector3>();
+            shape.UpdateData();
+            var bezier = BezierCurveManager.Instance.SweepCurve;
+            var scale = Mathf.Lerp(StarScale, FinalScale, t);
+            var point = bezier.GetOrientedPointAt(t);
+            for (var i = 0; i < shape.VertexCount; i++)
+            {
+                verts.Add(point.LocalToWorldPosition(shape.Vertices[i].point * scale));
+            }
+
+            return verts;
+        }
     }
 }

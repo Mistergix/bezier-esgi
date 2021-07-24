@@ -18,9 +18,14 @@ namespace Esgi.Bezier
         [SerializeField] public float starScale = 1; 
         [SerializeField] public float finalScale = 0.2f;
         [SerializeField] public Vector3 revolutionAxis = Vector3.up;
+        [Range(0, 1f)] public float tTest;
+
+        [SerializeField] private Extrusion extrusion;
+        [SerializeField] private ExtrusionRevolution extrusionRevolution;
 
         private float currentOrtho;
 
+        public ExtrusionBase CurrentExtrusion => currentMode == Mode.Revolution ? (ExtrusionBase)extrusionRevolution : (ExtrusionBase)extrusion;
 
         public override void Init()
         {
@@ -41,6 +46,7 @@ namespace Esgi.Bezier
             currentOrtho = Mathf.Clamp(currentOrtho, orthoMin, orthoMax);
             ((CinemachineFreeLook) cam3D).m_CommonLens = true;
             ((CinemachineFreeLook) cam3D).m_Lens.OrthographicSize = currentOrtho;
+
         }
 
         public bool ShowConvexHull => showConvexHull;
@@ -63,10 +69,10 @@ namespace Esgi.Bezier
         public Profile2D sweepProfile2D;
         public Profile2D profile2DProfile2D;
         public Mode currentMode;
-        
+
         [Title("NOT IN UI")]
-        [SerializeField] public CinemachineVirtualCameraBase cam2D, cam3D;
-        [Range(0, 1f)] public float tTest;
+        [SerializeField] public CinemachineVirtualCameraBase cam2D;
+        [SerializeField] public CinemachineVirtualCameraBase cam3D;
         public float orthoMin = 2;
         public float orthoMax = 20;
         public float scrollSpeed = 5;
