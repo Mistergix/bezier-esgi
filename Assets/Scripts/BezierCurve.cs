@@ -212,12 +212,22 @@ namespace Esgi.Bezier
 
         public override void DrawShapes(Camera cam)
         {
-            if(!CanDraw) {return;}
+            if(!CanDraw && Manager.Instance.Is2DEditing) {return;}
             using (Draw.Command(cam))
             {
                 if (Profile2D == Manager.Profile2D.Bezier)
                 {
-                    DrawBezierCurve();
+                    if (Manager.Instance.Is2DEditing)
+                    {
+                        DrawBezierCurve();
+                    }
+                    else
+                    {
+                        if(Manager.Instance.currentMode != Manager.Mode.Revolution || Mode != Manager.Mode.SweepPath)
+                        {
+                            DrawBezierCurve();
+                        }
+                    }
                 }
                 
                 if (Profile2D == Manager.Profile2D.Polygon || Manager.Instance.Is2DEditing)

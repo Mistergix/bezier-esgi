@@ -1,7 +1,10 @@
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using PGSauce.Core.Utilities;
+using Sirenix.OdinInspector;
 
 namespace Esgi.Bezier
 {
@@ -15,8 +18,31 @@ namespace Esgi.Bezier
         [SerializeField] public float starScale = 1; 
         [SerializeField] public float finalScale = 0.2f;
         [SerializeField] public Vector3 revolutionAxis = Vector3.up;
-        [Range(0, 1f)] public float tTest;
-        
+
+        private float currentOrtho;
+
+
+        public override void Init()
+        {
+            base.Init();
+            currentOrtho = Mathf.Lerp(orthoMin, orthoMax, 0.5f);
+        }
+
+        private void Update()
+        {
+            cam2D.Priority = Is2DEditing ? 50 : 0;
+            cam3D.Priority = Is2DEditing ? 0 : 50;
+
+            
+            
+            var diff = Input.mouseScrollDelta.y * scrollSpeed;
+            currentOrtho -= diff;
+
+            currentOrtho = Mathf.Clamp(currentOrtho, orthoMin, orthoMax);
+            ((CinemachineFreeLook) cam3D).m_CommonLens = true;
+            ((CinemachineFreeLook) cam3D).m_Lens.OrthographicSize = currentOrtho;
+        }
+
         public bool ShowConvexHull => showConvexHull;
         public bool Is2DEditing => Instance.currentMode == Mode.SweepPath || Instance.currentMode == Mode.Profile2D;
 
@@ -38,5 +64,11 @@ namespace Esgi.Bezier
         public Profile2D profile2DProfile2D;
         public Mode currentMode;
         
+        [Title("NOT IN UI")]
+        [SerializeField] public CinemachineVirtualCameraBase cam2D, cam3D;
+        [Range(0, 1f)] public float tTest;
+        public float orthoMin = 2;
+        public float orthoMax = 20;
+        public float scrollSpeed = 5;
     }
 }
