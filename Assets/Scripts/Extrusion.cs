@@ -9,87 +9,13 @@ using UnityEditor;
 
 namespace Esgi.Bezier
 {
-    public class Extrusion : MonoSingleton<Extrusion>
+    public class Extrusion : ExtrusionBase
     {
-        [Range(2, 200)]
-        [SerializeField] private int edgeRingCount = 20;
+        public override string ExtrusionMeshName => "Extrusion Généralisée de balayage";
+        public override Manager.Mode ExtrusionMode => Manager.Mode.General;
 
-        [SerializeField] private float starScale = 1;
-        [SerializeField] private float finalScale = 0.2f;
-        [SerializeField] private Mesh2D shape;
-        public bool doNormals;
-        private Mesh mesh;
-
-        [SerializeField] private bool debugMesh2D;
-
-        [SerializeField, Range(0, 1f), ShowIf("@debugMesh2D")]
-        private float tTest;
-
-        private void OnDrawGizmos()
+        protected override void GenerateMesh()
         {
-            if(!debugMesh2D) {return;}
-            OrientatedPoint op;
-
-            if (BezierCurveManager.Instance)
-            {
-                if (BezierCurveManager.Instance.CurrentCurve.ControlPointsCount <= 1)
-                {
-                    return;
-                }
-                op = BezierCurveManager.Instance.CurrentCurve.GetOrientedPointAt(tTest);
-            }
-            else
-            {
-                op = new OrientatedPoint()
-                {
-                    position = Vector2.zero,
-                    rotation = Quaternion.identity
-                };
-            }
-            
-            var scale =  Mathf.Lerp(starScale, finalScale, tTest);
-            
-            for (var i = 0; i < shape.VertexCount; i++)
-            {
-                var pos = op.LocalToWorldPosition(shape.Vertices[i].point * scale);
-                Gizmos.DrawSphere(pos, 0.15f);
-                Gizmos.DrawRay(pos, op.LocalToWorldDirection(shape.Vertices[i].normal));
-            }
-
-            for (var i = 0; i < shape.LineCount; i++)
-            {
-                var index = shape.LineIndices[i];
-                var vert = shape.Vertices[index];
-                
-                var pos = op.LocalToWorldPosition(vert.point * scale) + Vector3.up * .2f;
-                Handles.Label(pos, $"{index}");
-            }
-        }
-
-
-        public override void Init()
-        {
-            base.Init();
-            mesh = new Mesh {name = "Extrusion Généralisée de balayage"};
-            GetComponent<MeshFilter>().sharedMesh = mesh;
-        }
-
-        private void Update()
-        {
-            GenerateMesh();
-        }
-
-        private void OnDisable()
-        {
-            mesh.Clear();
-        }
-
-        void GenerateMesh()
-        {
-            mesh.Clear();
-            
-            if(Manager.Instance.currentMode != Manager.Mode.General){return;}
-
             var bezier = BezierCurveManager.Instance.CurrentCurve;
             
             var verts = new List<Vector3>();

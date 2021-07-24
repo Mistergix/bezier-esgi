@@ -1,15 +1,13 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using NaughtyAttributes;
 
 namespace Esgi.Bezier
 {
-    public class ExtrusionRevolution : MonoBehaviour
+    public class ExtrusionRevolution : ExtrusionBase
     {
-        [Range(2, 200)]
-        [SerializeField] private int edgeRingCount = 20;
-        [SerializeField] private Mesh2D shape;
-        public bool doNormals;
-        private Mesh mesh;
+        public override string ExtrusionMeshName => "Extrusion par révolution";
+        public override Manager.Mode ExtrusionMode => Manager.Mode.Revolution;
     }
 }

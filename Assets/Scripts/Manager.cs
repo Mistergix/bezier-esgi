@@ -9,6 +9,9 @@ namespace Esgi.Bezier
     {
         [SerializeField] private bool showConvexHull;
         public bool closePolygon;
+        [SerializeField] public float starScale = 1; 
+        [SerializeField] public float finalScale = 0.2f;
+        
         public bool ShowConvexHull => showConvexHull;
         
         public enum Profile2D
