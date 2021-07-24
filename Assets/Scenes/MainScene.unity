@@ -152,8 +152,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c44e2dfbfda1bae45acb36a2bfde22c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  edgeRingCount: 20
   showConvexHull: 0
   closePolygon: 0
+  starScale: 1
+  finalScale: 0
+  tTest: 0
   profile2D: 0
   currentMode: 0
 --- !u!4 &472450312
@@ -432,13 +436,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dda86fa157ee6542be26d4493d0310f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  edgeRingCount: 5
-  starScale: 1
-  finalScale: 1
   shape: {fileID: 11400000, guid: 0d1be2e1dacf377459ea633508724461, type: 2}
   doNormals: 1
+  mesh: {fileID: 0}
   debugMesh2D: 1
-  tTest: 0
 --- !u!33 &1475089991
 MeshFilter:
   m_ObjectHideFlags: 0

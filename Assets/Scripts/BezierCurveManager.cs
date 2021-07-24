@@ -19,11 +19,24 @@ namespace Esgi.Bezier
         [SerializeField] private BezierCurve bezierCurvePrefab;
         [SerializeField] private Color handleColor = Color.red, curveColor = Color.blue, mainCurveColor = Color.magenta;
         [SerializeField] private CurveTransform curveTransform;
-        [SerializeField] private bool manipulateCurrentCurve = true;
         
 
         private List<BezierCurve> curves;
-        public BezierCurve CurrentCurve => curves[_currentCurveIndex];
+        public BezierCurve CurrentCurve => GetCurrentCurve();
+
+        private BezierCurve GetCurrentCurve()
+        {
+            switch (Manager.Instance.currentMode)
+            {
+                case Manager.Mode.SweepPath : return SweepCurve;
+                case Manager.Mode.Profile2D : return Profile2DCurve;
+            }
+
+            return null;
+        }
+
+        public BezierCurve SweepCurve => curves?[0];
+        public BezierCurve Profile2DCurve => curves?[1];
 
         [ShowInInspector, ReadOnly]
         private int _currentCurveIndex;
@@ -56,74 +69,62 @@ namespace Esgi.Bezier
             pointToCurve = new Dictionary<ControlPoint, BezierCurve>();
             curves = new List<BezierCurve>();
             NewCurve();
+            NewCurve();
             controlPointMover = new ControlPointMover();
+            SweepCurve.Mode = Manager.Mode.SweepPath;
+            Profile2DCurve.Mode = Manager.Mode.Profile2D;
         }
 
-        [Button, DisableInEditorMode]
+        //[Button, DisableInEditorMode]
         public void NewCurve()
         {
-            if (CurrentCurveEmpty)
-            {
-                PGDebug.Message($"Pas de curve générée").LogWarning();
-                return;
-            }
             BezierCurve currentCurve = Instantiate(bezierCurvePrefab, transform);
             curves.Add(currentCurve);
             _currentCurveIndex = curves.Count - 1;
         }
 
-        private bool CurrentCurveEmpty => curves.Count > 0 && CurrentCurve.PointCount == 0;
+        // [Button, DisableInEditorMode]
+        // public void PrevCurve()
+        // {
+        //     _currentCurveIndex--;
+        //     if (_currentCurveIndex < 0)
+        //     {
+        //         _currentCurveIndex += curves.Count;
+        //     }
+        // }
 
-        
-
-        [Button, DisableInEditorMode]
-        public void PrevCurve()
-        {
-            _currentCurveIndex--;
-            if (_currentCurveIndex < 0)
-            {
-                _currentCurveIndex += curves.Count;
-            }
-        }
-
-        [Button, DisableInEditorMode]
-        public void NextCurve()
-        {
-            _currentCurveIndex++;
-            _currentCurveIndex %= curves.Count;
-        }
-
-        [Button, DisableInEditorMode]
-        public void DeleteCurrentCurve()
-        {
-            if (CurrentCurveEmpty)
-            {
-                PGDebug.Message($"La courbe n'a pas été détruite").LogWarning();
-                return;
-            }
-
-            var points = pointToCurve.Keys.Where(point => pointToCurve[point] == CurrentCurve);
-
-            var controlPoints = points.ToList();
-            foreach (var point in controlPoints)
-            {
-                pointToCurve.Remove(point);
-            }
-
-            PGDebug.SetCondition(true).Message($"{controlPoints.Count()} points removed").Log();
-            
-            Destroy(CurrentCurve.gameObject);
-            curves.Remove(CurrentCurve);
-
-            if (curves.Count == 0)
-            {
-                NewCurve();
-            }
-            else
-            {
-                NextCurve();
-            }
-        }
+        // [Button, DisableInEditorMode]
+        // public void NextCurve()
+        // {
+        //     _currentCurveIndex++;
+        //     _currentCurveIndex %= curves.Count;
+        // }
+        //
+        // [Button, DisableInEditorMode]
+        // public void DeleteCurrentCurve()
+        // {
+        //     var points = pointToCurve.Keys.Where(point => pointToCurve[point] == CurrentCurve);
+        //
+        //     var controlPoints = points.ToList();
+        //     foreach (var point in controlPoints)
+        //     {
+        //         pointToCurve.Remove(point);
+        //     }
+        //
+        //     PGDebug.SetCondition(true).Message($"{controlPoints.Count()} points removed").Log();
+        //     
+        //     Destroy(CurrentCurve.gameObject);
+        //     curves.Remove(CurrentCurve);
+        //
+        //     if (curves.Count == 0)
+        //     {
+        //         NewCurve();
+        //     }
+        //     else
+        //     {
+        //         NextCurve();
+        //     }
+        // }
 
         [NotNull] private List<Vector2> originalPos;
 
@@ -132,7 +133,8 @@ namespace Esgi.Bezier
         
         private void Update()
         {
-            if(Manager.Instance.currentMode != Manager.Mode.Profile2D){return;}
+            if(!SweepCurve.CanDraw && ! Profile2DCurve.CanDraw){return;}
+            
             Vector3 clickInWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             _allControlPoints = AllControlPoints();
             var closestPoints = BezierCurve.ControlPointsInRadius(_allControlPoints, clickInWorldPos);
@@ -193,8 +195,7 @@ namespace Esgi.Bezier
                         throw new UnityException("IMPOSSIBLE");
                     }
 
-                    action(clickInWorldPos, manipulateCurrentCurve ? CurrentCurve.ControlPoints : _allControlPoints,
-                        originalPos);
+                    action(clickInWorldPos, CurrentCurve.ControlPoints, originalPos);
 
                     curveTransform.ShowPoint = true;
                 }
@@ -227,14 +228,7 @@ namespace Esgi.Bezier
 
         private void SetOriginalPositions()
         {
-            if (manipulateCurrentCurve)
-            {
-                originalPos = CurrentCurve.ControlPoints.Select(point => point.position).ToList();
-            }
-            else
-            {
-                originalPos = _allControlPoints.Select(point => point.position).ToList();
-            }
+            originalPos = CurrentCurve.ControlPointsPositions();
         }
 
         private void TryDestroyPoint(List<ControlPoint> closestPoints)

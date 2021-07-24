@@ -7,23 +7,21 @@ namespace Esgi.Bezier
 {
     public abstract class ExtrusionBase : MonoBehaviour
     {
-        [Range(2, 200)]
-        [SerializeField] public int edgeRingCount = 20;
+        public int edgeRingCount => Manager.Instance.edgeRingCount;
         [SerializeField] public Mesh2D shape;
         public bool doNormals;
         public Mesh mesh;
 
         [SerializeField] public bool debugMesh2D;
 
-        [SerializeField, Range(0, 1f), ShowIf("@debugMesh2D")]
-        public float tTest;
+        public float tTest => Manager.Instance.tTest;
 
         private void OnDrawGizmos()
         {
             if(!debugMesh2D) {return;}
             OrientatedPoint op;
 
-            if (BezierCurveManager.Instance)
+            if (Application.isPlaying)
             {
                 if (BezierCurveManager.Instance.CurrentCurve.ControlPointsCount <= 1)
                 {
