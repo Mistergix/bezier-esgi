@@ -14,21 +14,65 @@ namespace Esgi.Bezier
         public override string ExtrusionMeshName => "Extrusion Généralisée de balayage";
         public override Manager.Mode ExtrusionMode => Manager.Mode.General;
 
+        private static float FinalScale => Manager.Instance.finalScale;
+
+        private static float StarScale => Manager.Instance.starScale;
+
+        protected override void DrawGizmos()
+        {
+            base.DrawGizmos();
+            OrientatedPoint op;
+
+            if (Application.isPlaying)
+            {
+                if (BezierCurveManager.Instance.SweepCurve.ControlPointsCount <= 1)
+                {
+                    return;
+                }
+                op = BezierCurveManager.Instance.SweepCurve.GetOrientedPointAt(tTest);
+            }
+            else
+            {
+                op = new OrientatedPoint
+                {
+                    position = Vector2.zero,
+                    rotation = Quaternion.identity
+                };
+            }
+            var scale =  Mathf.Lerp(StarScale, FinalScale, tTest);
+            
+            for (var i = 0; i < shape.VertexCount; i++)
+            {
+                var pos = op.LocalToWorldPosition(shape.Vertices[i].point * scale);
+                Gizmos.DrawSphere(pos, 0.15f);
+                Gizmos.DrawRay(pos, op.LocalToWorldDirection(shape.Vertices[i].normal));
+            }
+
+            for (var i = 0; i < shape.LineCount; i++)
+            {
+                var index = shape.LineIndices[i];
+                var vert = shape.Vertices[index];
+                
+                var pos = op.LocalToWorldPosition(vert.point * scale) + Vector3.up * .2f;
+                Handles.Label(pos, $"{index}");
+            }
+        }
+
         protected override void GenerateMesh()
         {
-            var bezier = BezierCurveManager.Instance.CurrentCurve;
+            var bezier = BezierCurveManager.Instance.SweepCurve;
             
             var verts = new List<Vector3>();
             var normals = new List<Vector3>();
             for (var ring = 0; ring < edgeRingCount; ring++)
             {
                 var t = (float) ring / (edgeRingCount - 1);
-                var scale = Mathf.Lerp(starScale, finalScale, t);
+                var scale = Mathf.Lerp(StarScale, FinalScale, t);
                 var point = bezier.GetOrientedPointAt(t);
                 for (var i = 0; i < shape.VertexCount; i++)
                 {
                     verts.Add(point.LocalToWorldPosition(shape.Vertices[i].point * scale));
-                    normals.Add(point.LocalToWorldDirection(shape.Vertices[i].normal));
+                    normals.Add(point.LocalToWorldDirection(shape.Vertices[i].normal).normalized);
                 }
             }
 

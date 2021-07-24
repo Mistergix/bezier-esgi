@@ -17,7 +17,7 @@ namespace Esgi.Bezier
 
         private void OnDrawGizmos()
         {
-            if(ControlPoints.Count <2){return;}
+            if(ControlPoints.Count < 2 || Mode != Manager.Mode.SweepPath){return;}
             var p = GetOrientedPointAt(tTest);
             Handles.PositionHandle(p.position, p.rotation);
         }
@@ -29,7 +29,7 @@ namespace Esgi.Bezier
         public OrientatedPoint GetOrientedPointAt(float t)
         {
 
-            if (Manager.Instance.profile2D == Manager.Profile2D.Bezier)
+            if (Profile2D == Manager.Profile2D.Bezier)
             {
                 return new OrientatedPoint()
                 {
@@ -197,7 +197,7 @@ namespace Esgi.Bezier
             bool close = Mode == Manager.Mode.SweepPath
                 ? Manager.Instance.closeSweepCurve
                 : Manager.Instance.closeProfile2DCurve;
-            if (close)
+            if (close && controlPoints.Count >= 1)
             {
                 points.Add(controlPoints[0]);
             }
@@ -215,12 +215,12 @@ namespace Esgi.Bezier
             if(!CanDraw) {return;}
             using (Draw.Command(cam))
             {
-                if (Manager.Instance.profile2D == Manager.Profile2D.Bezier)
+                if (Profile2D == Manager.Profile2D.Bezier)
                 {
                     DrawBezierCurve();
                 }
                 
-                if (Manager.Instance.profile2D == Manager.Profile2D.Polygon || Manager.Instance.currentMode == Manager.Mode.SweepPath || Manager.Instance.currentMode == Manager.Mode.Profile2D)
+                if (Profile2D == Manager.Profile2D.Polygon || Manager.Instance.Is2DEditing)
                 {
                     DrawControlPolygon();
                 }
@@ -263,7 +263,7 @@ namespace Esgi.Bezier
             for (var i = 0; i < ControlPoints.Count - 1; i++)
             {
                 DrawControlPolygons(i);
-                if (Manager.Instance.currentMode == Manager.Mode.SweepPath || Manager.Instance.currentMode == Manager.Mode.Profile2D)
+                if (Manager.Instance.Is2DEditing)
                 {
                     DrawControlPointsHandles(i);
                     if (i == ControlPoints.Count - 2)
@@ -273,7 +273,7 @@ namespace Esgi.Bezier
                 }
             }
             
-            if (Manager.Instance.currentMode == Manager.Mode.SweepPath || Manager.Instance.currentMode == Manager.Mode.Profile2D)
+            if (Manager.Instance.Is2DEditing)
             {
                 if (ControlPoints.Count >= 1)
                 {
@@ -293,6 +293,10 @@ namespace Esgi.Bezier
         public int ControlPointsCount => ControlPoints.Count;
         public bool CanDraw => Mode == Manager.Instance.currentMode;
         public Manager.Mode Mode { get; set; }
+
+        public Manager.Profile2D Profile2D => Mode == Manager.Mode.SweepPath
+            ? Manager.Instance.sweepProfile2D
+            : Manager.Instance.profile2DProfile2D;
 
         private void DrawControlPointsHandles(int i)
         {

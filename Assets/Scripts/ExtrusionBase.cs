@@ -19,47 +19,14 @@ namespace Esgi.Bezier
         private void OnDrawGizmos()
         {
             if(!debugMesh2D) {return;}
-            OrientatedPoint op;
-
-            if (Application.isPlaying)
-            {
-                if (BezierCurveManager.Instance.CurrentCurve.ControlPointsCount <= 1)
-                {
-                    return;
-                }
-                op = BezierCurveManager.Instance.CurrentCurve.GetOrientedPointAt(tTest);
-            }
-            else
-            {
-                op = new OrientatedPoint()
-                {
-                    position = Vector2.zero,
-                    rotation = Quaternion.identity
-                };
-            }
-            
-            var scale =  Mathf.Lerp(starScale, finalScale, tTest);
-            
-            for (var i = 0; i < shape.VertexCount; i++)
-            {
-                var pos = op.LocalToWorldPosition(shape.Vertices[i].point * scale);
-                Gizmos.DrawSphere(pos, 0.15f);
-                Gizmos.DrawRay(pos, op.LocalToWorldDirection(shape.Vertices[i].normal));
-            }
-
-            for (var i = 0; i < shape.LineCount; i++)
-            {
-                var index = shape.LineIndices[i];
-                var vert = shape.Vertices[index];
-                
-                var pos = op.LocalToWorldPosition(vert.point * scale) + Vector3.up * .2f;
-                Handles.Label(pos, $"{index}");
-            }
+            if(ExtrusionMode != Manager.Instance.currentMode){return;}
+            DrawGizmos();
         }
 
-        public float finalScale => Manager.Instance.finalScale;
-
-        public float starScale => Manager.Instance.starScale;
+        protected virtual void DrawGizmos()
+        {
+            
+        }
 
         protected void Awake()
         {
@@ -79,6 +46,7 @@ namespace Esgi.Bezier
         {
             mesh.Clear();
             if(Manager.Instance.currentMode != ExtrusionMode){return;}
+            GetComponent<MeshFilter>().sharedMesh = mesh;
             GenerateMesh();
         }
 

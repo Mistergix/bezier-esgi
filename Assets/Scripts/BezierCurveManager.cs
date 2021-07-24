@@ -22,7 +22,7 @@ namespace Esgi.Bezier
         
 
         private List<BezierCurve> curves;
-        public BezierCurve CurrentCurve => GetCurrentCurve();
+        private BezierCurve CurrentCurve => GetCurrentCurve();
 
         private BezierCurve GetCurrentCurve()
         {
@@ -35,8 +35,8 @@ namespace Esgi.Bezier
             return null;
         }
 
-        public BezierCurve SweepCurve => curves?[0];
-        public BezierCurve Profile2DCurve => curves?[1];
+        public BezierCurve SweepCurve => curves?.Count >= 1 ? curves?[0] : null;
+        public BezierCurve Profile2DCurve => curves?.Count >= 2 ? curves?[1] : null;
 
         [ShowInInspector, ReadOnly]
         private int _currentCurveIndex;
