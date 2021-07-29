@@ -19,10 +19,6 @@ namespace Esgi.Bezier
         [SerializeField] public float finalScale = 0.2f;
         [SerializeField] public Vector3 revolutionAxis = Vector3.up;
         [Range(0, 1f)] public float tTest;
-
-        [SerializeField] private Extrusion extrusion;
-        [SerializeField] private ExtrusionRevolution extrusionRevolution;
-
         private float currentOrtho;
 
         public ExtrusionBase CurrentExtrusion => currentMode == Mode.Revolution ? (ExtrusionBase)extrusionRevolution : (ExtrusionBase)extrusion;
@@ -60,8 +56,8 @@ namespace Esgi.Bezier
         
         public enum Mode
         {
-            SweepPath,
-            Profile2D,
+            SweepPath, // CHEMIN
+            Profile2D, // FORME 2D à extruder
             Revolution,
             General
         }
@@ -76,5 +72,7 @@ namespace Esgi.Bezier
         public float orthoMin = 2;
         public float orthoMax = 20;
         public float scrollSpeed = 5;
+        [SerializeField] private Extrusion extrusion;
+        [SerializeField] private ExtrusionRevolution extrusionRevolution;
     }
 }
